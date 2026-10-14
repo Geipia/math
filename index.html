@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Vecteurs & droites</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout : feuille quadrillée, barre latérale de navigation + zone de travail ; onglets en bas sur téléphone */
+:root{
+  --bg:#F2F4F8; --grid-bg:#E3E8F1; --surface:#FFFFFF; --surface-2:#E7EBF3; --ink:#16203A; --ink-2:#56617B; --line:#D2D9E5; --grid-l:#DDE3EE;
+  --vec:#3B4FD0; --vec-soft:#E1E5FB; --rep:#0B827E; --rep-soft:#D8F0EE; --col:#B85A0C; --col-soft:#F8E6D5;
+  --ps:#A7377F; --ps-soft:#F6DFEE; --dr:#38812B; --dr-soft:#E0F0DA; --met:#6A45B8; --met-soft:#E9E1F7;
+  --good:#257A49; --good-soft:#DCF0E3; --bad:#B9362F; --bad-soft:#F8E0DE;
+  --f-head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:10px; --side:250px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1422; --grid-bg:#161D2F; --surface:#161D2E; --surface-2:#212A3F; --ink:#E4E8F2; --ink-2:#99A3BB; --line:#2E3850; --grid-l:#28324A;
+  --vec:#8C9BFF; --vec-soft:#22295A; --rep:#4FCBC4; --rep-soft:#123533; --col:#F0A458; --col-soft:#3D2810;
+  --ps:#EA86C6; --ps-soft:#3E1B33; --dr:#8BD07B; --dr-soft:#1C3518; --met:#B79BF2; --met-soft:#2C2148;
+  --good:#6FCB92; --good-soft:#163A26; --bad:#F08A82; --bad-soft:#43201D;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1422; --grid-bg:#161D2F; --surface:#161D2E; --surface-2:#212A3F; --ink:#E4E8F2; --ink-2:#99A3BB; --line:#2E3850; --grid-l:#28324A;
+  --vec:#8C9BFF; --vec-soft:#22295A; --rep:#4FCBC4; --rep-soft:#123533; --col:#F0A458; --col-soft:#3D2810;
+  --ps:#EA86C6; --ps-soft:#3E1B33; --dr:#8BD07B; --dr-soft:#1C3518; --met:#B79BF2; --met-soft:#2C2148;
+  --good:#6FCB92; --good-soft:#163A26; --bad:#F08A82; --bad-soft:#43201D;
+}
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-image:linear-gradient(var(--grid-bg) 1px,transparent 1px),linear-gradient(90deg,var(--grid-bg) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font:16px/1.55 var(--f-body);margin:0}
+h1,h2,h3{font-family:var(--f-head);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.02em}
+h2{font-size:23px;font-weight:700;letter-spacing:-.01em}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+button{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--vec);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-weight:500}
+
+/* notation vecteur : flèche au-dessus */
+.vec{position:relative;display:inline-block;padding-top:.32em;line-height:1;font-weight:700;white-space:nowrap}
+.vec::before{content:"";position:absolute;left:1px;right:3px;top:.1em;height:1.6px;background:currentColor}
+.vec::after{content:"";position:absolute;right:0;top:calc(.1em - 3.2px);border-left:6px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent}
+
+/* shell */
+.app{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+.side{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;height:100vh;padding:22px 16px;border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:22px;overflow:auto}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none}
+.brand-mark{width:38px;height:38px;flex:none}
+.brand b{font-family:var(--f-head);font-size:18px;display:block;line-height:1.1}
+.brand span{font-size:12px;color:var(--ink-2)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--ink-2);font-weight:700;font-size:15px}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav a.on{background:var(--ink);color:var(--bg)}
+.nav svg{width:18px;height:18px;flex:none}
+.side-h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:700;margin-bottom:6px}
+.side-ch{display:flex;flex-direction:column;gap:9px}
+.side-ch a{text-decoration:none;display:grid;grid-template-columns:1fr auto;gap:3px 8px;font-size:14px}
+.side-ch a .bar{grid-column:1/-1}
+.side-ch a span:last-of-type{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:13px}
+.sync{margin-top:auto;font-size:12px;color:var(--ink-2);display:flex;gap:6px;align-items:center}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--ink-2);flex:none}
+.sync.ok i{background:var(--good)}
+main{padding:28px clamp(16px,4vw,48px) 90px;min-width:0;max-width:1100px;width:100%}
+.tabs{display:none}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  main{padding:20px 16px 110px}
+  .tabs{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;text-decoration:none;color:var(--ink-2);padding:4px 0;border-radius:8px}
+  .tabs a.on{color:var(--ink);background:var(--surface-2)}
+  .tabs svg{width:20px;height:20px}
+}
+
+/* commun */
+.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-2)}
+.head{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.head p.lead{color:var(--ink-2);max-width:62ch}
+.stack{display:flex;flex-direction:column;gap:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;line-height:1.2}
+.btn:hover{border-color:var(--ink-2)}
+.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.pri:hover{opacity:.9}
+.btn.sm{padding:6px 10px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:3px;background:var(--c,var(--ink))}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--cs,var(--surface-2));color:var(--c,var(--ink))}
+.muted{color:var(--ink-2)}
+.small{font-size:14px}
+[data-ch="vec"]{--c:var(--vec);--cs:var(--vec-soft)}
+[data-ch="rep"]{--c:var(--rep);--cs:var(--rep-soft)}
+[data-ch="col"]{--c:var(--col);--cs:var(--col-soft)}
+[data-ch="ps"]{--c:var(--ps);--cs:var(--ps-soft)}
+[data-ch="dr"]{--c:var(--dr);--cs:var(--dr-soft)}
+[data-ch="met"]{--c:var(--met);--cs:var(--met-soft)}
+.empty{padding:28px;text-align:center;color:var(--ink-2);font-size:15px}
+
+/* figures quadrillées */
+.gfig{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.g-grid{stroke:var(--grid-l);stroke-width:1}
+.g-ax{stroke:var(--ink-2);stroke-width:1.5}
+.g-axh{fill:var(--ink-2)}
+.g-t{fill:var(--ink-2);font:500 11px var(--f-mono)}
+.g-pt{fill:var(--ink)}
+.g-pl{fill:var(--ink);font:700 14px var(--f-body);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.g-v{stroke:var(--k);stroke-width:2.6;stroke-linecap:round}
+.g-vh{fill:var(--k)}
+.g-vl{fill:var(--k);font:700 italic 14px var(--f-body);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.g-line{stroke:var(--k);stroke-width:2;fill:none}
+.g-poly{fill:var(--k);fill-opacity:.1;stroke:var(--k);stroke-width:1.5;stroke-dasharray:5 4}
+.g-ra{fill:none;stroke:var(--ink-2);stroke-width:1.5}
+
+/* tableau de bord */
+.dash-top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;margin-bottom:28px}
+@media (max-width:760px){.dash-top{grid-template-columns:1fr}}
+.overall{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.ring{width:118px;height:118px;flex:none}
+.ring .bgc{stroke:var(--surface-2)} .ring .fgc{stroke:var(--vec)}
+.ring text{fill:var(--ink);font-family:var(--f-head);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,auto);gap:4px 22px}
+.stats b{font-family:var(--f-head);font-size:28px;font-variant-numeric:tabular-nums;line-height:1}
+.stats span{font-size:13px;color:var(--ink-2)}
+.next h3{margin:6px 0 4px}
+.chcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;margin-bottom:28px}
+.chcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;text-decoration:none}
+.chcard:hover{border-color:var(--c)}
+.chcard .f{font-family:var(--f-mono);color:var(--c);font-size:14px;font-weight:600}
+.chcard h3{font-size:17px}
+.chcard .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.sec-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.chart svg{width:100%;height:auto;display:block}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .ax{fill:var(--ink-2);font:12px var(--f-body)}
+.chart .ln{stroke:var(--vec);stroke-width:2.5;fill:none}
+.chart .ar{fill:var(--vec);opacity:.1}
+.chart .dt{fill:var(--surface);stroke:var(--vec);stroke-width:2}
+.chart .dt.ex{fill:var(--vec)}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,13px);gap:3px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:13px;height:13px;border-radius:3px;background:var(--surface-2)}
+.heat i.l1{background:color-mix(in srgb,var(--vec) 30%,var(--surface-2))}
+.heat i.l2{background:color-mix(in srgb,var(--vec) 55%,var(--surface-2))}
+.heat i.l3{background:color-mix(in srgb,var(--vec) 78%,var(--surface-2))}
+.heat i.l4{background:var(--vec)}
+
+/* cours */
+.ch-hero{border-radius:var(--r);padding:24px;background:var(--cs);display:grid;grid-template-columns:1fr minmax(0,240px);gap:20px;align-items:center;margin-bottom:22px}
+.ch-hero .f{font-family:var(--f-mono);color:var(--c);font-weight:600;font-size:16px}
+.ch-hero .gfig{max-width:240px}
+.ch-hero .g-pl,.ch-hero .g-vl{stroke:var(--cs)}
+@media (max-width:700px){.ch-hero{grid-template-columns:1fr}.ch-hero>div:last-child{display:none}}
+.toc{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:26px}
+.toc a{font-size:14px;padding:5px 10px;border-radius:99px;border:1px solid var(--line);text-decoration:none;background:var(--surface);display:inline-flex;gap:6px;align-items:center}
+.toc a.read::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,28px);margin-bottom:16px;display:flex;flex-direction:column;gap:14px;scroll-margin-top:16px}
+.sec h2{display:flex;gap:10px;align-items:baseline}
+.sec h2 .n{font-family:var(--f-mono);font-size:14px;color:var(--c)}
+.sec p,.sec li{max-width:68ch}
+.sec ul,.sec ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.sec .done{align-self:flex-start}
+.sec .done.on{background:var(--cs);border-color:var(--c);color:var(--c)}
+.eq{font-family:var(--f-mono);background:var(--surface-2);border-radius:8px;padding:12px 16px;font-size:15.5px;overflow-x:auto;white-space:nowrap;line-height:1.9}
+.eq .vec{font-family:var(--f-body)}
+.callout{border-radius:8px;padding:12px 14px;font-size:15px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line)}
+.callout b.t{font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.callout.trap{background:var(--bad-soft);border-color:transparent}.callout.trap b.t{color:var(--bad)}
+.callout.key{background:var(--cs);border-color:transparent}.callout.key b.t{color:var(--c)}
+.callout.ex{background:var(--bg);border-color:transparent}.callout.ex b.t{color:var(--ink-2)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+td.m{font-family:var(--f-mono);font-size:14px;white-space:nowrap}
+.fig{margin:0;display:flex;flex-direction:column;gap:6px}
+.fig-sc{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px}
+.fig figcaption{font-size:13px;color:var(--ink-2)}
+.props{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.props div{background:var(--bg);border-radius:8px;padding:14px;font-size:15px}
+.props b{display:block;margin-bottom:4px;font-family:var(--f-head);font-size:16px}
+.live{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;background:var(--bg);border-radius:8px;padding:14px}
+@media (max-width:700px){.live{grid-template-columns:1fr}}
+.live-in{display:flex;flex-direction:column;gap:10px}
+.live-in label{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-weight:700}
+.live-in input{width:62px}
+.live-out{display:flex;flex-direction:column;gap:8px;font-size:15px;min-width:0}
+.live-out .r{font-family:var(--f-mono);font-size:14.5px}
+.verdict{font-weight:700;padding:4px 10px;border-radius:99px;align-self:flex-start;font-size:14px}
+.verdict.ok{background:var(--good-soft);color:var(--good)}.verdict.ko{background:var(--surface-2);color:var(--ink-2)}
+.ch-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px}
+
+/* entraînement */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.fchip{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink-2)}
+.fchip.on{border-color:var(--c);background:var(--cs);color:var(--c)}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px}
+.mode{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;text-align:left;cursor:pointer}
+.mode:hover{border-color:var(--ink-2)}
+.mode .ic{width:34px;height:34px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center}
+.mode .ic svg{width:20px;height:20px}
+.mode b{font-family:var(--f-head);font-size:17px}
+.mode span{font-size:14px;color:var(--ink-2)}
+.mode .badge{align-self:flex-start;font-size:12px;font-weight:700;font-style:normal;background:var(--bad-soft);color:var(--bad);padding:2px 8px;border-radius:99px}
+.mode.feature{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mode.feature span{color:color-mix(in srgb,var(--bg) 75%,transparent)}
+.mode.feature .ic{background:color-mix(in srgb,var(--bg) 15%,transparent)}
+.mode.feature .badge{background:var(--bg);color:var(--bad)}
+.mode-h{margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+.gens{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:10px}
+.gen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left;cursor:pointer}
+.gen:hover{border-color:var(--c)}
+.gen b{font-family:var(--f-head);font-size:16px}
+.gen span{font-size:13.5px;color:var(--ink-2)}
+.gen .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+
+.sess{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.sess-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sess-top .t{font-family:var(--f-head);font-weight:700;font-size:18px}
+.sess-top .cnt{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:14px}
+.timer{font-family:var(--f-mono);font-weight:600;font-variant-numeric:tabular-nums;padding:4px 10px;border-radius:8px;background:var(--surface-2)}
+.timer.low{background:var(--bad-soft);color:var(--bad)}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(16px,3vw,26px);display:flex;flex-direction:column;gap:16px}
+.qhead{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.qtext{font-family:var(--f-head);font-size:20px;font-weight:500;line-height:1.45}
+.qtext .vec{font-family:var(--f-body)}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:flex;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;cursor:pointer;font-size:16px}
+.choice:hover:not(:disabled){border-color:var(--ink-2)}
+.choice kbd{font:600 12px var(--f-mono);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink-2);flex:none}
+.choice.ok{border-color:var(--good);background:var(--good-soft)}
+.choice.ko{border-color:var(--bad);background:var(--bad-soft)}
+.choice:disabled{cursor:default}
+.vf{flex-direction:row;flex-wrap:wrap}.vf .choice{flex:1 1 200px;justify-content:center;font-weight:700}
+.ans{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:19px;font-family:var(--f-mono)}
+.ans .vec{font-family:var(--f-body)}
+.ans input,.live-in input{font:600 18px var(--f-mono);padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:110px;text-align:center}
+.ans input:focus,.live-in input:focus{border-color:var(--vec);outline:none}
+.ans input.ok{border-color:var(--good);background:var(--good-soft)}
+.ans input.ko{border-color:var(--bad);background:var(--bad-soft)}
+.keys{display:flex;gap:6px;flex-wrap:wrap}
+.keys button{font:600 15px var(--f-mono);border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:5px 11px;cursor:pointer}
+.hint{font-size:13px;color:var(--ink-2)}
+.fb{border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.fb.ok{background:var(--good-soft)}.fb.ko{background:var(--bad-soft)}
+.fb>b{font-family:var(--f-head);font-size:17px}
+.fb.ok>b{color:var(--good)}.fb.ko>b{color:var(--bad)}
+.sol{background:var(--surface);border-radius:8px;padding:12px 14px;font-size:15.5px;display:flex;flex-direction:column;gap:8px;line-height:1.7}
+.sol .l{font-family:var(--f-mono);font-size:14.5px;overflow-x:auto}
+.sol .l .vec{font-family:var(--f-body)}
+.sol .gfig{max-width:340px}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.flash{min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;cursor:pointer;padding:30px 22px}
+.flash .front{font-family:var(--f-head);font-size:25px;font-weight:700;max-width:24ch}
+.flash .back{font-size:19px;max-width:46ch;font-family:var(--f-mono);line-height:1.8}
+.flash .back .vec{font-family:var(--f-body)}
+.flash .hint{font-size:13px}
+.res-big{display:flex;align-items:baseline;gap:10px}
+.res-big b{font-family:var(--f-head);font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.brk{display:flex;flex-direction:column;gap:10px}
+.brk div{display:grid;grid-template-columns:110px 1fr 60px;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
+.wrong{display:flex;flex-direction:column;gap:12px}
+.wrong>div{border-left:3px solid var(--bad);padding:4px 0 4px 12px;font-size:15px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.wrong details summary{cursor:pointer;font-size:14px;color:var(--ink-2);font-weight:700}
+
+/* progrès */
+.skills{display:flex;flex-direction:column;gap:6px}
+.skill{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;font-size:15px}
+.skill .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--ink-2);flex:none;display:grid;place-items:center;margin-top:1px}
+.skill.on .box{background:var(--good);border-color:var(--good)}
+.skill.on .box::after{content:"";width:9px;height:5px;border-left:2.5px solid var(--surface);border-bottom:2.5px solid var(--surface);transform:rotate(-45deg) translate(1px,-1px)}
+.skill.on{color:var(--ink-2)}
+.hist{display:flex;flex-direction:column}
+.hist div{display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
+.danger{border:1px solid var(--bad);color:var(--bad);background:transparent}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px;border-radius:8px;background:var(--bad-soft)}
+@media (prefers-reduced-motion:no-preference){
+  .bar>i{transition:width .5s ease}
+  .qcard,.sec{animation:rise .25s ease both}
+  @keyframes rise{from{transform:translateY(6px)}to{transform:none}}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="side" id="side"></aside>
+  <main id="main"></main>
+</div>
+<nav class="tabs" id="tabs"></nav>
+
+<script>
+"use strict";
+/* ================= CHAPITRES ================= */
+const CH=[
+  {id:"vec",name:"Fondements vectoriels & Chasles",short:"Chasles",f:"AB + BC = AC"},
+  {id:"rep",name:"Repères & calcul analytique",short:"Repères",f:"(xB − xA ; yB − yA)"},
+  {id:"col",name:"Colinéarité & alignement",short:"Colinéarité",f:"x·y' − x'·y = 0"},
+  {id:"ps",name:"Produit scalaire & orthogonalité",short:"Produit scalaire",f:"x·x' + y·y'"},
+  {id:"dr",name:"Équations de droites",short:"Droites",f:"ax + by + c = 0"},
+  {id:"met",name:"Méthodes pour l’interro",short:"Méthodes",f:"AB = DC"}
+];
+const CHM=Object.fromEntries(CH.map(c=>[c.id,c]));
+
+/* ================= OUTILS ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pad=n=>String(n).padStart(2,"0");
+const dkey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>dkey(new Date());
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const rnz=(a,b)=>{let v;do v=ri(a,b);while(v===0);return v};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const near=(a,b,t=1e-6)=>Math.abs(a-b)<=t;
+
+/* notation */
+const V=s=>`<span class="vec">${s}</span>`;
+function F(n){if(Math.abs(n-Math.round(n))<1e-9)n=Math.round(n);else n=Math.round(n*1000)/1000;return (n<0?"−":"")+String(Math.abs(n)).replace(".",",")}
+const cx=k=>k===1?"":k===-1?"−":F(k);
+const par=n=>n<0?`(${F(n)})`:F(n);
+const C2=(x,y)=>`(${F(x)} ; ${F(y)})`;
+function simp(n){let k=1,r=n;for(let i=Math.floor(Math.sqrt(n));i>=2;i--)if(n%(i*i)===0){k=i;r=n/(i*i);break}return[k,r]}
+function RT(n){if(n===0)return"0";const[k,r]=simp(n);if(r===1)return F(k);return(k===1?"":F(k))+"√"+r}
+function rootTxt(n){const s=Math.sqrt(n);return Number.isInteger(s)?`√${n} = ${F(s)}`:`√${n}${RT(n)!=="√"+n?" = "+RT(n):""} ≈ ${F(Math.round(s*100)/100)}`}
+function term(k,v,first){if(k===0)return"";const a=Math.abs(k),s=k<0?(first?"−":" − "):(first?"":" + ");return s+(v&&a===1?"":F(a))+v}
+function eqS(a,b,c){let s=term(a,"x",true);s+=term(b,"y",!s);s+=term(c,"",!s);return(s||"0")+" = 0"}
+function coord(x0,d,v){if(d===0)return`${v} = ${F(x0)}`;const a=Math.abs(d);return`${v} = ${x0===0?(d<0?"−":""):F(x0)+(d<0?" − ":" + ")}${a===1?"":a+"·"}k`}
+const sysS=(xa,ya,d1,d2)=>`{ ${coord(xa,d1,"x")} ; ${coord(ya,d2,"y")} }`;
+function comb(a,u,b,v){const t=(k,n,f)=>{const s=k<0?(f?"−":" − "):(f?"":" + "),m=Math.abs(k);return s+(m===1?"":m)+V(n)};return t(a,u,true)+t(b,v,false)}
+
+/* lecture d’une réponse : nombres, virgule, fractions, √ */
+function parseX(raw){
+  let s=String(raw||"").replace(/\s+/g,"").replace(/,/g,".").replace(/[−–]/g,"-").replace(/racine|sqrt|rac/gi,"√").replace(/[×x*]/g,"*").replace(/÷|:/g,"/");
+  if(!s)return null;let i=0;
+  const peek=()=>s[i];
+  function expr(){let v=termP();while(peek()==="+"||peek()==="-"){const o=s[i++];const w=termP();v=o==="+"?v+w:v-w}return v}
+  function termP(){let v=fac();for(;;){const c=peek();if(c==="*"||c==="/"){i++;const w=fac();v=c==="*"?v*w:v/w}else if(c==="√"||c==="("){v*=fac()}else break}return v}
+  function fac(){const c=peek();
+    if(c==="-"){i++;return -fac()}if(c==="+"){i++;return fac()}
+    if(c==="√"){i++;return Math.sqrt(fac())}
+    if(c==="("){i++;const v=expr();if(s[i]!==")")throw 0;i++;return v}
+    const m=/^\d*\.?\d+/.exec(s.slice(i));if(!m)throw 0;i+=m[0].length;return parseFloat(m[0])}
+  try{const v=expr();if(i!==s.length||!isFinite(v))return null;return v}catch(e){return null}
+}
+
+/* ================= FIGURES QUADRILLÉES ================= */
+const KC={k1:"var(--vec)",k2:"var(--col)",k3:"var(--ps)",k4:"var(--dr)",k5:"var(--rep)",k6:"var(--met)"};
+function autoR(pts,mn=6){
+  let xs=[0],ys=[0];pts.forEach(p=>{xs.push(p[0]);ys.push(p[1])});
+  let x0=Math.floor(Math.min(...xs))-1,x1=Math.ceil(Math.max(...xs))+1,y0=Math.floor(Math.min(...ys))-1,y1=Math.ceil(Math.max(...ys))+1;
+  while(x1-x0<mn){x1++;if(x1-x0<mn)x0--}while(y1-y0<mn-2){y1++;if(y1-y0<mn-2)y0--}
+  return{xr:[Math.max(x0,-16),Math.min(x1,16)],yr:[Math.max(y0,-12),Math.min(y1,12)]};
+}
+function G(o){
+  const[x0,x1]=o.xr,[y0,y1]=o.yr,span=Math.max(x1-x0,y1-y0),u=o.u||(span>14?20:span>10?26:34),m=20;
+  const W=(x1-x0)*u+2*m,H=(y1-y0)*u+2*m,X=x=>+(m+(x-x0)*u).toFixed(1),Y=y=>+(m+(y1-y)*u).toFixed(1);
+  let s="";
+  for(let x=x0;x<=x1;x++)s+=`<line x1="${X(x)}" y1="${Y(y0)}" x2="${X(x)}" y2="${Y(y1)}" class="g-grid"/>`;
+  for(let y=y0;y<=y1;y++)s+=`<line x1="${X(x0)}" y1="${Y(y)}" x2="${X(x1)}" y2="${Y(y)}" class="g-grid"/>`;
+  const step=span>12?2:1;
+  if(y0<=0&&y1>=0){s+=`<line x1="${X(x0)}" y1="${Y(0)}" x2="${X(x1)+8}" y2="${Y(0)}" class="g-ax"/><polygon points="${X(x1)+12},${Y(0)} ${X(x1)+4},${Y(0)-4} ${X(x1)+4},${Y(0)+4}" class="g-axh"/>`;
+    for(let x=x0;x<=x1;x++)if(x&&x%step===0)s+=`<text x="${X(x)}" y="${Y(0)+14}" text-anchor="middle" class="g-t">${F(x)}</text>`}
+  if(x0<=0&&x1>=0){s+=`<line x1="${X(0)}" y1="${Y(y0)}" x2="${X(0)}" y2="${Y(y1)-8}" class="g-ax"/><polygon points="${X(0)},${Y(y1)-12} ${X(0)-4},${Y(y1)-4} ${X(0)+4},${Y(y1)-4}" class="g-axh"/>`;
+    for(let y=y0;y<=y1;y++)if(y&&y%step===0)s+=`<text x="${X(0)-6}" y="${Y(y)+4}" text-anchor="end" class="g-t">${F(y)}</text>`;
+    if(y0<=0&&y1>=0)s+=`<text x="${X(0)-6}" y="${Y(0)+14}" text-anchor="end" class="g-t">O</text>`}
+  (o.polys||[]).forEach(([p,k])=>s+=`<polygon points="${p.map(q=>X(q[0])+","+Y(q[1])).join(" ")}" class="g-poly" style="--k:${KC[k]}"/>`);
+  (o.lines||[]).forEach(([a,b,c,k,lab])=>{
+    const P=[];const add=(x,y)=>{if(x>=x0-1e-9&&x<=x1+1e-9&&y>=y0-1e-9&&y<=y1+1e-9)P.push([x,y])};
+    if(b!==0){add(x0,(-c-a*x0)/b);add(x1,(-c-a*x1)/b)}if(a!==0){add((-c-b*y0)/a,y0);add((-c-b*y1)/a,y1)}
+    if(P.length<2)return;P.sort((p,q)=>p[0]-q[0]||p[1]-q[1]);const A=P[0],B=P[P.length-1];
+    s+=`<line x1="${X(A[0])}" y1="${Y(A[1])}" x2="${X(B[0])}" y2="${Y(B[1])}" class="g-line" style="--k:${KC[k]}"/>`;
+    if(lab)s+=`<text x="${X(B[0])-6}" y="${Y(B[1])+(B[1]>=y1-.01?16:-6)}" text-anchor="end" class="g-vl" style="--k:${KC[k]}">${lab}</text>`});
+  (o.ra||[]).forEach(([cx,cy,ux,uy,vx,vy])=>{const L1=Math.hypot(ux,uy),L2=Math.hypot(vx,vy),d=.42;const a=[cx+ux/L1*d,cy+uy/L1*d],b=[cx+vx/L2*d,cy+vy/L2*d],c=[a[0]+vx/L2*d,a[1]+vy/L2*d];
+    s+=`<polyline points="${X(a[0])},${Y(a[1])} ${X(c[0])},${Y(c[1])} ${X(b[0])},${Y(b[1])}" class="g-ra"/>`});
+  (o.vecs||[]).forEach(([xa,ya,xb,yb,k,lab])=>{
+    const A=[X(xa),Y(ya)],B=[X(xb),Y(yb)],dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy);if(L<1)return;
+    const ux=dx/L,uy=dy/L,bx=B[0]-ux*11,by=B[1]-uy*11;
+    s+=`<g style="--k:${KC[k]}"><line x1="${A[0]}" y1="${A[1]}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" class="g-v"/><polygon points="${B[0]},${B[1]} ${(bx-uy*5.5).toFixed(1)},${(by+ux*5.5).toFixed(1)} ${(bx+uy*5.5).toFixed(1)},${(by-ux*5.5).toFixed(1)}" class="g-vh"/>`;
+    if(lab){const mx=(A[0]+B[0])/2-uy*13,my=(A[1]+B[1])/2+ux*13+5;s+=`<text x="${mx.toFixed(1)}" y="${my.toFixed(1)}" text-anchor="middle" class="g-vl">${lab}</text>`}
+    s+="</g>"});
+  (o.pts||[]).forEach(([n,x,y,pos])=>{const dx=pos==="l"?-8:8,dy=pos==="b"?18:-8;s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4" class="g-pt"/>`+(n?`<text x="${X(x)+dx}" y="${Y(y)+dy}" text-anchor="${pos==="l"?"end":"start"}" class="g-pl">${n}</text>`:"")});
+  return `<svg class="gfig" viewBox="0 0 ${W+14} ${H}" role="img" aria-label="${esc(o.alt||"Figure dans un repère")}">${s}</svg>`;
+}
+const fig=(o,cap)=>`<figure class="fig"><div class="fig-sc">${G(o)}</div>${cap?`<figcaption>${cap}</figcaption>`:""}</figure>`;
+
+/* ================= COURS ================= */
+const callout=(k,t,h)=>`<div class="callout ${k}"><b class="t">${t}</b><div>${h}</div></div>`;
+const COURSE={
+vec:()=>[
+ {id:"def",t:"Qu’est-ce qu’un vecteur ?",h:`
+  <p>Un vecteur ${V("u")} est une flèche qu’on peut déplacer sans la tourner ni l’étirer. Il est caractérisé par trois éléments :</p>
+  <div class="props"><div><b>Direction</b>L’orientation de la droite qui le porte (sa « pente »).</div><div><b>Sens</b>Vers où pointe la flèche, sur cette direction.</div><div><b>Norme</b>Sa longueur, notée ‖${V("u")}‖. Toujours positive ou nulle.</div></div>
+  ${fig({xr:[0,9],yr:[0,6],vecs:[[1,1,4,3,"k1",""],[5,1,8,3,"k1",""],[4,6,1,4,"k2",""]],pts:[["A",1,1,"b"],["B",4,3],["C",5,1,"b"],["D",8,3],["E",4,6],["F",1,4,"l"]]},`${V("AB")} = ${V("CD")} : même direction, même sens, même norme. ${V("EF")} a la même direction et la même norme mais le sens opposé : ${V("EF")} = −${V("AB")}.`)}`},
+ {id:"chasles",t:"La relation de Chasles",h:`
+  <p>Pour <b>tous points</b> A, B et C :</p>
+  <div class="eq">${V("AB")} + ${V("BC")} = ${V("AC")}</div>
+  <p>Aller de A à B, puis de B à C, revient à aller directement de A à C.</p>
+  ${fig({xr:[0,8],yr:[0,6],vecs:[[1,1,6,2,"k1",""],[6,2,3,5,"k1",""],[1,1,3,5,"k2",""]],pts:[["A",1,1,"b"],["B",6,2],["C",3,5]]},`Les deux flèches bleues mises bout à bout donnent la flèche orange ${V("AC")}.`)}
+  ${callout("key","Le réflexe",`La lettre « du milieu » doit être la même : ${V("A<b>B</b>")} + ${V("<b>B</b>C")}. Elle disparaît et il reste ${V("AC")}. Ça marche avec autant de vecteurs que tu veux : ${V("AB")} + ${V("BC")} + ${V("CD")} = ${V("AD")}.`)}`},
+ {id:"props",t:"Opposé, vecteur nul, commutativité",h:`
+  <div class="tbl-wrap"><table><tr><th>Propriété</th><th>Écriture</th><th>En mots</th></tr>
+  <tr><td><b>Opposé</b></td><td class="m">${V("BA")} = −${V("AB")}</td><td>Même direction, même norme, sens contraire.</td></tr>
+  <tr><td><b>Vecteur nul</b></td><td class="m">${V("AA")} = ${V("0")}</td><td>On ne bouge pas : norme 0.</td></tr>
+  <tr><td><b>Commutativité</b></td><td class="m">${V("u")} + ${V("v")} = ${V("v")} + ${V("u")}</td><td>L’ordre de l’addition ne change rien.</td></tr></table></div>
+  <p>En coordonnées, on additionne composante par composante, et multiplier par un réel k multiplie chaque composante :</p>
+  <div class="eq">${V("u")}(x ; y) + ${V("v")}(x' ; y') = (x + x' ; y + y')<br>k·${V("u")} = (k·x ; k·y)</div>
+  ${callout("trap","Piège",`Soustraire un vecteur, c’est ajouter son opposé : ${V("AB")} − ${V("CB")} = ${V("AB")} + ${V("BC")} = ${V("AC")}.`)}`}
+],
+rep:()=>[
+ {id:"repere",t:"Le repère (O, i, j)",h:`
+  <p>Dans un repère cartésien du plan (O, ${V("i")}, ${V("j")}), tout point et tout vecteur sont définis par leurs <b>coordonnées</b> : d’abord l’abscisse x, puis l’ordonnée y.</p>
+  ${fig({xr:[-1,6],yr:[-1,4],vecs:[[0,0,1,0,"k1","i"],[0,0,0,1,"k1","j"],[0,0,4,3,"k5",""]],pts:[["P(4 ; 3)",4,3]]},`Le point P a pour coordonnées (4 ; 3). Le vecteur ${V("OP")} a les mêmes composantes : (4 ; 3).`)}`},
+ {id:"compo",t:"Composantes d’un vecteur AB",h:`
+  <div class="eq">${V("AB")} = (x<sub>B</sub> − x<sub>A</sub> ; y<sub>B</sub> − y<sub>A</sub>)</div>
+  <p>On calcule <b>arrivée moins départ</b>, pour x puis pour y.</p>
+  ${callout("ex","Exemple",`A(1 ; −2) et B(4 ; 3) : ${V("AB")} = (4 − 1 ; 3 − (−2)) = (3 ; 5).`)}
+  ${fig({xr:[-1,6],yr:[-3,4],vecs:[[1,-2,4,3,"k5",""]],pts:[["A",1,-2,"b"],["B",4,3]]},"On avance de 3 vers la droite et on monte de 5.")}`},
+ {id:"milieu",t:"Milieu d’un segment",h:`
+  <div class="eq">M = ( (x<sub>A</sub> + x<sub>B</sub>) / 2 ; (y<sub>A</sub> + y<sub>B</sub>) / 2 )</div>
+  <p>C’est la <b>moyenne</b> des coordonnées : on additionne, puis on divise par 2.</p>
+  ${callout("ex","Exemple","A(1 ; −2) et B(4 ; 3) : M = ((1 + 4)/2 ; (−2 + 3)/2) = (2,5 ; 0,5).")}
+  ${callout("trap","Piège classique",`Ne confonds pas : le vecteur ${V("AB")} se calcule avec une <b>soustraction</b> (B − A), le milieu avec une <b>addition</b> divisée par 2.`)}`},
+ {id:"norme",t:"Norme et distance",h:`
+  <div class="eq">‖${V("u")}‖ = √(x² + y²)   pour ${V("u")}(x ; y)<br>d(A, B) = AB = √((x<sub>B</sub> − x<sub>A</sub>)² + (y<sub>B</sub> − y<sub>A</sub>)²)</div>
+  <p>C’est le théorème de Pythagore : les composantes sont les deux côtés de l’angle droit, la norme est l’hypoténuse. La distance AB est la norme du vecteur ${V("AB")}.</p>
+  ${fig({xr:[0,6],yr:[0,5],polys:[[[[1,1],[5,1],[5,4]],"k5"]],vecs:[[1,1,5,4,"k1",""]],ra:[[5,1,-1,0,0,1]],pts:[["A",1,1,"b"],["B",5,4]]},`${V("AB")}(4 ; 3) : AB = √(4² + 3²) = √25 = 5.`)}
+  ${callout("ex","Exemple","A(1 ; −2) et B(4 ; 3) : AB = √(3² + 5²) = √34 ≈ 5,83.")}`},
+ {id:"labo",t:"Labo : essaie avec tes propres points",h:`<p>Change les coordonnées de A et B : tout se recalcule.</p>${liveBox("rep")}`}
+],
+col:()=>[
+ {id:"def",t:"Vecteurs colinéaires",h:`
+  <p>Deux vecteurs ${V("u")} et ${V("v")} sont <b>colinéaires</b> s’il existe un réel k tel que ${V("u")} = k·${V("v")}. Ils ont alors la même direction (même sens si k &gt; 0, sens opposés si k &lt; 0).</p>
+  ${fig({xr:[0,10],yr:[0,5],vecs:[[1,1,3,2,"k2","u"],[3,3,7,5,"k2","2u"],[9,4,5,2,"k1","−2u"]]},`${V("u")}, 2${V("u")} et −2${V("u")} sont colinéaires : ils sont tous parallèles.`)}`},
+ {id:"critere",t:"Le critère de colinéarité",h:`
+  <p>Pour ${V("u")}(x ; y) et ${V("v")}(x' ; y') :</p>
+  <div class="eq">${V("u")} et ${V("v")} colinéaires  ⟺  x·y' − x'·y = 0</div>
+  <p>C’est un <b>produit en croix</b> : on multiplie en diagonale, puis on soustrait.</p>
+  ${callout("ex","Exemple",`${V("u")}(2 ; −3) et ${V("v")}(−4 ; 6) : 2 × 6 − (−4) × (−3) = 12 − 12 = 0. Ils sont colinéaires (en fait ${V("v")} = −2${V("u")}).`)}
+  ${callout("trap","Attention aux signes","Mets toujours les nombres négatifs entre parenthèses : (−4) × (−3) = +12, donc on soustrait 12.")}`},
+ {id:"applis",t:"Applications : parallélisme et alignement",h:`
+  <div class="props"><div><b>Droites parallèles</b>(AB) ∥ (CD) ⟺ ${V("AB")} et ${V("CD")} colinéaires.</div><div><b>Points alignés</b>A, B, C alignés ⟺ ${V("AB")} et ${V("AC")} colinéaires.</div></div>
+  ${callout("ex","Exemple",`A(1 ; 1), B(3 ; 2), C(7 ; 4). ${V("AB")}(2 ; 1), ${V("AC")}(6 ; 3). 2 × 3 − 6 × 1 = 0, donc A, B, C sont alignés.`)}
+  ${fig({xr:[0,8],yr:[0,5],lines:[[1,-2,1,"k2",""]],pts:[["A",1,1,"b"],["B",3,2,"b"],["C",7,4,"b"]]},"Les trois points sont sur une même droite.")}`},
+ {id:"labo",t:"Labo : colinéaires ou pas ?",h:liveBox("col")}
+],
+ps:()=>[
+ {id:"def",t:"Le produit scalaire cartésien",h:`
+  <p>Le produit scalaire de ${V("u")}(x ; y) et ${V("v")}(x' ; y') est un <b>nombre réel</b> (pas un vecteur) :</p>
+  <div class="eq">${V("u")} · ${V("v")} = x·x' + y·y'</div>
+  <p>On multiplie les x entre eux, les y entre eux, puis on additionne.</p>
+  ${callout("ex","Exemple",`${V("u")}(3 ; −1) · ${V("v")}(2 ; 5) = 3 × 2 + (−1) × 5 = 6 − 5 = 1.`)}`},
+ {id:"orth",t:"La condition d’orthogonalité",h:`
+  <p>Deux vecteurs non nuls sont <b>orthogonaux</b> (perpendiculaires) si et seulement si leur produit scalaire est nul :</p>
+  <div class="eq">${V("u")} ⊥ ${V("v")}  ⟺  x·x' + y·y' = 0</div>
+  ${fig({xr:[-2,4],yr:[-1,4],vecs:[[0,0,3,1,"k3","u"],[0,0,-1,3,"k1","v"]],ra:[[0,0,3,1,-1,3]]},`${V("u")}(3 ; 1) · ${V("v")}(−1 ; 3) = −3 + 3 = 0 : angle droit.`)}
+  <div class="tbl-wrap"><table><tr><th>Ne confonds pas</th><th>Formule</th><th>Si elle vaut 0</th></tr>
+  <tr><td><b>Colinéarité</b></td><td class="m">x·y' − x'·y</td><td>vecteurs parallèles</td></tr>
+  <tr><td><b>Produit scalaire</b></td><td class="m">x·x' + y·y'</td><td>vecteurs perpendiculaires</td></tr></table></div>`},
+ {id:"labo",t:"Labo : perpendiculaires ou pas ?",h:liveBox("ps")}
+],
+dr:()=>[
+ {id:"param",t:"Équation vectorielle et paramétrique",h:`
+  <p>Soit d la droite passant par A(x<sub>A</sub> ; y<sub>A</sub>) et dirigée par ${V("v")}(d₁ ; d₂). Un point P(x ; y) est sur d si :</p>
+  <div class="eq">Équation vectorielle : ${V("AP")} = k·${V("v")}   (k ∈ ℝ)<br>Système paramétrique : { x = x<sub>A</sub> + k·d₁ ; y = y<sub>A</sub> + k·d₂ }</div>
+  <p>Chaque valeur de k donne un point de la droite.</p>
+  ${fig({xr:[-2,8],yr:[-1,5],lines:[[1,-2,1,"k4",""]],vecs:[[1,1,3,2,"k1","v"]],pts:[["k = −1",-1,0,"b"],["A (k = 0)",1,1,"b"],["k = 1",3,2,"b"],["k = 2",5,3,"b"]]},`d passe par A(1 ; 1), dirigée par ${V("v")}(2 ; 1) : { x = 1 + 2k ; y = 1 + k }.`)}`},
+ {id:"cart",t:"Équation cartésienne",h:`
+  <p>Toute droite a une équation de la forme :</p>
+  <div class="eq">a·x + b·y + c = 0   avec (a ; b) ≠ (0 ; 0)</div>
+  <div class="props"><div><b>Vecteur directeur</b>${V("v")}(−b ; a) : il suit la droite.</div><div><b>Vecteur normal</b>${V("n")}(a ; b) : il est perpendiculaire à la droite.</div></div>
+  ${fig({xr:[-2,6],yr:[-1,5],lines:[[1,-2,2,"k4","d"]],vecs:[[2,2,4,3,"k1","v"],[2,2,3,0,"k3","n"]],ra:[[2,2,2,1,1,-2]]},`d : x − 2y + 2 = 0. a = 1, b = −2 : ${V("v")}(2 ; 1) et ${V("n")}(1 ; −2).`)}
+  <p>Un point appartient à la droite si ses coordonnées <b>vérifient l’équation</b>. Par exemple (2 ; 2) : 2 − 4 + 2 = 0 ✓.</p>`},
+ {id:"trouver",t:"Trouver une équation cartésienne",h:`
+  <p>Méthode avec un point A et un vecteur directeur ${V("v")}(d₁ ; d₂) :</p>
+  <ol><li>Comme ${V("v")} = (−b ; a), on prend <b>a = d₂</b> et <b>b = −d₁</b>.</li><li>On remplace x et y par les coordonnées de A pour trouver <b>c</b>.</li></ol>
+  ${callout("ex","Exemple",`A(1 ; 2) et ${V("v")}(3 ; 1) : a = 1, b = −3, donc x − 3y + c = 0. A est sur d : 1 − 6 + c = 0, donc c = 5. Réponse : x − 3y + 5 = 0.`)}
+  ${callout("key","Bon à savoir","Une droite a une infinité d’équations : en multipliant tout par 2, 2x − 6y + 10 = 0 décrit la même droite.")}`},
+ {id:"labo",t:"Labo : dessine une droite",h:liveBox("dr")}
+],
+met:()=>[
+ {id:"rect",t:"Démontrer qu’un triangle ABC est rectangle en A",h:`
+  <p>On calcule les composantes de ${V("AB")} et ${V("AC")}, puis on vérifie que <b>${V("AB")} · ${V("AC")} = 0</b>.</p>
+  ${callout("ex","Exemple",`A(1 ; 1), B(4 ; 2), C(0 ; 4). ${V("AB")}(3 ; 1), ${V("AC")}(−1 ; 3). ${V("AB")} · ${V("AC")} = 3 × (−1) + 1 × 3 = 0. Le triangle est rectangle en A.`)}
+  ${fig({xr:[-1,5],yr:[0,5],polys:[[[[1,1],[4,2],[0,4]],"k6"]],vecs:[[1,1,4,2,"k6",""],[1,1,0,4,"k6",""]],ra:[[1,1,3,1,-1,3]],pts:[["A",1,1,"b"],["B",4,2],["C",0,4,"l"]]})}`},
+ {id:"para",t:"Trouver D pour former un parallélogramme ABCD",h:`
+  <p>On utilise l’égalité vectorielle <b>${V("AB")} = ${V("DC")}</b> (attention à l’ordre des lettres !).</p>
+  ${callout("ex","Exemple",`A(1 ; 1), B(5 ; 1), C(6 ; 4). ${V("AB")} = (4 ; 0) et ${V("DC")} = (6 − x<sub>D</sub> ; 4 − y<sub>D</sub>). Donc 6 − x<sub>D</sub> = 4 et 4 − y<sub>D</sub> = 0 : D(2 ; 4).`)}
+  ${fig({xr:[0,7],yr:[0,5],polys:[[[[1,1],[5,1],[6,4],[2,4]],"k6"]],vecs:[[1,1,5,1,"k6",""],[2,4,6,4,"k6",""]],pts:[["A",1,1,"b"],["B",5,1,"b"],["C",6,4],["D",2,4]]},"On tourne dans l’ordre A → B → C → D : AB et DC pointent dans le même sens.")}
+  ${callout("key","Raccourci",`${V("AB")} = ${V("DC")} donne directement x<sub>D</sub> = x<sub>A</sub> + x<sub>C</sub> − x<sub>B</sub> et y<sub>D</sub> = y<sub>A</sub> + y<sub>C</sub> − y<sub>B</sub>.`)}`},
+ {id:"inter",t:"Déterminer l’intersection de deux droites",h:`
+  <p>On résout le <b>système</b> formé par les deux équations (cartésiennes ou paramétriques). La solution (x ; y) donne le point d’intersection.</p>
+  ${callout("ex","Exemple","d₁ : x + y − 5 = 0 et d₂ : 2x − y − 1 = 0. En additionnant : 3x − 6 = 0, donc x = 2. Puis 2 + y − 5 = 0, donc y = 3. Les droites se coupent en I(2 ; 3).")}
+  ${fig({xr:[-1,6],yr:[-1,6],lines:[[1,1,-5,"k4","d₁"],[2,-1,-1,"k1","d₂"]],pts:[["I",2,3]]})}
+  <p>Si les vecteurs directeurs sont colinéaires, les droites sont parallèles (ou confondues) : pas de point d’intersection unique.</p>`},
+ {id:"pieges",t:"Pièges classiques à éviter",h:`
+  ${callout("trap","Vecteur ou milieu ?",`${V("AB")} = (x<sub>B</sub> − x<sub>A</sub> ; y<sub>B</sub> − y<sub>A</sub>), mais M = ((x<sub>A</sub> + x<sub>B</sub>)/2 ; (y<sub>A</sub> + y<sub>B</sub>)/2).`)}
+  ${callout("trap","Les signes du produit en croix","Dans x·y' − x'·y, mets les négatifs entre parenthèses et n’oublie pas le « moins » du milieu.")}
+  ${callout("trap","L’ordre des lettres",`Dans un parallélogramme ABCD, ${V("AB")} = ${V("DC")} et non ${V("CD")}.`)}`}
+]
+};
+
+/* ----- labos interactifs ----- */
+const LIVE={
+ rep:{f:[["xA",-2],["yA",1],["xB",4],["yB",3]],lay:v=>`<label>A ( ${v.xA} ; ${v.yA} )</label><label>B ( ${v.xB} ; ${v.yB} )</label>`,
+  out(n){const dx=n.xB-n.xA,dy=n.yB-n.yA,mx=(n.xA+n.xB)/2,my=(n.yA+n.yB)/2,d2=dx*dx+dy*dy,ok=Number.isInteger(d2);
+   return `<span class="r">${V("AB")} = ${C2(dx,dy)}</span><span class="r">M = ${C2(mx,my)}</span><span class="r">AB = ${ok?rootTxt(d2):F(Math.sqrt(d2))}</span>`+
+   G({...autoR([[n.xA,n.yA],[n.xB,n.yB]]),vecs:[[n.xA,n.yA,n.xB,n.yB,"k5",""]],pts:[["A",n.xA,n.yA,"b"],["B",n.xB,n.yB],["M",mx,my,"l"]]})}},
+ col:{f:[["x",2],["y",1],["x2",-4],["y2",-2]],lay:v=>`<label>${V("u")} ( ${v.x} ; ${v.y} )</label><label>${V("v")} ( ${v.x2} ; ${v.y2} )</label>`,
+  out(n){const d=n.x*n.y2-n.x2*n.y;return `<span class="r">x·y' − x'·y = ${par(n.x)}×${par(n.y2)} − ${par(n.x2)}×${par(n.y)} = ${F(d)}</span><span class="verdict ${d===0?"ok":"ko"}">${d===0?"Colinéaires":"Pas colinéaires"}</span>`+
+   G({...autoR([[n.x,n.y],[n.x2,n.y2]]),vecs:[[0,0,n.x,n.y,"k2","u"],[0,0,n.x2,n.y2,"k1","v"]]})}},
+ ps:{f:[["x",3],["y",1],["x2",-1],["y2",3]],lay:v=>`<label>${V("u")} ( ${v.x} ; ${v.y} )</label><label>${V("v")} ( ${v.x2} ; ${v.y2} )</label>`,
+  out(n){const p=n.x*n.x2+n.y*n.y2,o=p===0&&(n.x||n.y)&&(n.x2||n.y2);return `<span class="r">${V("u")} · ${V("v")} = ${par(n.x)}×${par(n.x2)} + ${par(n.y)}×${par(n.y2)} = ${F(p)}</span><span class="verdict ${o?"ok":"ko"}">${o?"Orthogonaux":"Pas orthogonaux"}</span>`+
+   G({...autoR([[n.x,n.y],[n.x2,n.y2]]),vecs:[[0,0,n.x,n.y,"k3","u"],[0,0,n.x2,n.y2,"k1","v"]],ra:o?[[0,0,n.x,n.y,n.x2,n.y2]]:[]})}},
+ dr:{f:[["a",1],["b",-2],["c",2]],lay:v=>`<label>${v.a} x + ${v.b} y + ${v.c} = 0</label>`,
+  out(n){if(!n.a&&!n.b)return `<span class="r">(a ; b) ne peut pas valoir (0 ; 0).</span>`;
+   const p=n.b!==0?[0,-n.c/n.b]:[-n.c/n.a,0];
+   return `<span class="r">d : ${eqS(n.a,n.b,n.c)}</span><span class="r">${V("v")}(−b ; a) = ${C2(-n.b,n.a)}</span><span class="r">${V("n")}(a ; b) = ${C2(n.a,n.b)}</span>`+
+   G({...autoR([p,[p[0]-n.b,p[1]+n.a],[p[0]+n.a,p[1]+n.b]],8),lines:[[n.a,n.b,n.c,"k4","d"]],vecs:[[p[0],p[1],p[0]-n.b,p[1]+n.a,"k1","v"],[p[0],p[1],p[0]+n.a,p[1]+n.b,"k3","n"]],pts:[["",p[0],p[1]]]})}}
+};
+function liveBox(k){const L=LIVE[k],v={};L.f.forEach(([n,d])=>v[n]=`<input id="lv-${k}-${n}" data-live="${k}" value="${d}" inputmode="text" aria-label="${n}">`);
+  return `<div class="live"><div class="live-in">${L.lay(v)}<span class="hint">Nombres entiers ou décimaux, négatifs acceptés.</span></div><div class="live-out" id="lo-${k}"></div></div>`}
+function runLive(k){const L=LIVE[k],o=$("#lo-"+k);if(!o)return;const n={};for(const[f]of L.f){const v=parseX($(`#lv-${k}-${f}`).value);if(v===null||Math.abs(v)>50){o.innerHTML=`<span class="muted small">Écris un nombre dans chaque case.</span>`;return}n[f]=v}o.innerHTML=L.out(n)}
+const SECS=Object.fromEntries(CH.map(c=>[c.id,COURSE[c.id]().map(s=>s.id)]));
+
+/* ================= QUESTIONS DE COURS ================= */
+const BANK=[];
+function Q(ch,q,c,exp){BANK.push({id:ch+":q"+BANK.filter(b=>b.ch===ch).length,ch,t:"qcm",q,c,exp})}
+function VF(ch,q,a,exp){BANK.push({id:ch+":q"+BANK.filter(b=>b.ch===ch).length,ch,t:"vf",q,a,exp})}
+const xA="x<sub>A</sub>",xB="x<sub>B</sub>",yA="y<sub>A</sub>",yB="y<sub>B</sub>";
+Q("vec","Un vecteur est caractérisé par…",["sa direction, son sens et sa norme","son point de départ et sa longueur","sa direction et son point d’arrivée","sa norme uniquement"],"Direction (droite support), sens (vers où pointe la flèche) et norme (longueur).");
+Q("vec",`${V("AA")} est…`,[`le vecteur nul ${V("0")}`,`égal à ${V("AB")}`,"un vecteur de norme 1","impossible à définir"],"On part de A et on arrive en A : on ne bouge pas, c’est le vecteur nul.");
+Q("vec",`D’après Chasles, ${V("AB")} + ${V("BC")} = …`,[V("AC"),V("CA"),V("BB"),V("AB")],"La lettre du milieu (B) disparaît : il reste A → C.");
+Q("vec","Deux vecteurs égaux ont…",["même direction, même sens et même norme","forcément la même origine","même direction mais des sens opposés","seulement la même norme"],"Égaux = mêmes trois caractéristiques, peu importe où ils sont placés.");
+VF("vec",`${V("BA")} = ${V("AB")}`,false,`Faux : ${V("BA")} = −${V("AB")}, c’est l’opposé (sens contraire).`);
+VF("vec",`${V("AB")} et ${V("BA")} ont la même norme.`,true,"Vrai : ils ont la même longueur, seul le sens change.");
+VF("vec",`${V("u")} + ${V("v")} = ${V("v")} + ${V("u")} pour tous vecteurs.`,true,"Vrai : c’est la commutativité de l’addition.");
+
+Q("rep",`Les composantes de ${V("AB")} sont…`,[`(${xB} − ${xA} ; ${yB} − ${yA})`,`(${xA} − ${xB} ; ${yA} − ${yB})`,`((${xA} + ${xB})/2 ; (${yA} + ${yB})/2)`,`(${xA} + ${xB} ; ${yA} + ${yB})`],"Arrivée moins départ : B − A.");
+Q("rep","Les coordonnées du milieu M de [AB] sont…",[`((${xA} + ${xB})/2 ; (${yA} + ${yB})/2)`,`((${xB} − ${xA})/2 ; (${yB} − ${yA})/2)`,`(${xB} − ${xA} ; ${yB} − ${yA})`,`(${xA}·${xB} ; ${yA}·${yB})`],"Le milieu est la moyenne des coordonnées : on additionne puis on divise par 2.");
+Q("rep",`La norme de ${V("u")}(x ; y) est…`,["√(x² + y²)","x² + y²","√x + √y","x + y"],"Pythagore : la racine de la somme des carrés.");
+Q("rep",`Si ${V("u")}(6 ; 8), alors ‖${V("u")}‖ = …`,["10","14","100","√14"],"√(36 + 64) = √100 = 10.");
+VF("rep",`La distance AB est égale à la norme du vecteur ${V("AB")}.`,true,`Vrai : d(A, B) = ‖${V("AB")}‖.`);
+VF("rep","La norme d’un vecteur peut être négative.",false,"Faux : c’est une longueur, toujours positive ou nulle.");
+VF("rep","A(2 ; 5) et B(6 ; 1) : le milieu de [AB] est M(4 ; 3).",true,"Vrai : ((2 + 6)/2 ; (5 + 1)/2) = (4 ; 3).");
+
+Q("col",`${V("u")} et ${V("v")} sont colinéaires si…`,[`il existe un réel k tel que ${V("u")} = k·${V("v")}`,`${V("u")} · ${V("v")} = 0`,`‖${V("u")}‖ = ‖${V("v")}‖`,`${V("u")} + ${V("v")} = ${V("0")}`],"Colinéaire = l’un est un multiple de l’autre.");
+Q("col",`${V("u")}(x ; y) et ${V("v")}(x' ; y') sont colinéaires si et seulement si…`,["x·y' − x'·y = 0","x·x' + y·y' = 0","x·y' + x'·y = 0","x − x' = y − y'"],"C’est le produit en croix. x·x' + y·y' = 0 est la condition d’orthogonalité.");
+Q("col","(AB) ∥ (CD) si et seulement si…",[`${V("AB")} et ${V("CD")} sont colinéaires`,`${V("AB")} · ${V("CD")} = 0`,`${V("AB")} = ${V("CD")} obligatoirement`,"A, B, C et D sont alignés"],"Droites parallèles ⟺ vecteurs directeurs colinéaires.");
+VF("col",`Si ${V("AB")} et ${V("AC")} sont colinéaires, alors A, B et C sont alignés.`,true,"Vrai : c’est le critère d’alignement.");
+VF("col",`${V("u")}(2 ; 3) et ${V("v")}(4 ; 6) sont colinéaires.`,true,`Vrai : 2 × 6 − 4 × 3 = 0 (et ${V("v")} = 2${V("u")}).`);
+VF("col",`Pour ${V("u")}(1 ; 2) et ${V("v")}(3 ; 5), le test de colinéarité est 1 × 5 + 3 × 2.`,false,"Faux : c’est une soustraction : 1 × 5 − 3 × 2 = −1 ≠ 0, donc pas colinéaires.");
+VF("col",`${V("u")}(−2 ; 4) et ${V("v")}(1 ; −2) sont colinéaires.`,true,`Vrai : (−2) × (−2) − 1 × 4 = 4 − 4 = 0. En fait ${V("u")} = −2${V("v")}.`);
+
+Q("ps",`Le produit scalaire de ${V("u")}(x ; y) et ${V("v")}(x' ; y') vaut…`,["x·x' + y·y'","x·y' − x'·y","(x + x')(y + y')","x·y + x'·y'"],"On multiplie les x entre eux, les y entre eux, et on additionne.");
+Q("ps","Le produit scalaire de deux vecteurs est…",["un nombre réel","un vecteur","un point","toujours positif"],"C’est un nombre, qui peut être positif, négatif ou nul.");
+Q("ps",`${V("u")}(2 ; −1) · ${V("v")}(3 ; 4) = …`,["2","10","11","−5"],"2 × 3 + (−1) × 4 = 6 − 4 = 2.");
+VF("ps","Deux vecteurs non nuls sont orthogonaux si et seulement si leur produit scalaire est nul.",true,"Vrai : c’est la condition d’orthogonalité.");
+VF("ps",`Si ${V("u")} · ${V("v")} = 0, alors ${V("u")} et ${V("v")} sont colinéaires.`,false,"Faux : produit scalaire nul = perpendiculaires, pas parallèles.");
+VF("ps",`${V("u")}(1 ; 2) et ${V("v")}(−2 ; 1) sont orthogonaux.`,true,"Vrai : 1 × (−2) + 2 × 1 = 0.");
+
+Q("dr","Un vecteur directeur de la droite ax + by + c = 0 est…",[`${V("v")}(−b ; a)`,`${V("v")}(a ; b)`,`${V("v")}(b ; a)`,`${V("v")}(a ; c)`],`(−b ; a) est directeur. (a ; b) est le vecteur normal.`);
+Q("dr","Un vecteur normal à la droite ax + by + c = 0 est…",[`${V("n")}(a ; b)`,`${V("n")}(−b ; a)`,`${V("n")}(c ; a)`,`${V("n")}(b ; c)`],"Le vecteur normal (perpendiculaire) se lit directement : (a ; b).");
+Q("dr",`L’équation vectorielle de la droite passant par A et dirigée par ${V("v")} est…`,[`${V("AP")} = k·${V("v")}`,`${V("AP")} · ${V("v")} = 0`,`${V("AP")} = ${V("v")} + k`,`‖${V("AP")}‖ = k`],`P est sur la droite quand ${V("AP")} est colinéaire à ${V("v")}.`);
+Q("dr",`Un système paramétrique de la droite passant par A(1 ; 2), dirigée par ${V("v")}(3 ; −1), est…`,["{ x = 1 + 3k ; y = 2 − k }","{ x = 3 + k ; y = −1 + 2k }","{ x = 1 − k ; y = 2 + 3k }","{ x = 1 + 2k ; y = 3 − k }"],"x = x<sub>A</sub> + k·d₁ et y = y<sub>A</sub> + k·d₂.");
+VF("dr","Dans ax + by + c = 0, a et b peuvent être nuls tous les deux.",false,"Faux : on impose (a ; b) ≠ (0 ; 0), sinon ce n’est plus une droite.");
+VF("dr",`La droite 2x − y + 3 = 0 a pour vecteur directeur ${V("v")}(1 ; 2).`,true,"Vrai : a = 2, b = −1, donc (−b ; a) = (1 ; 2).");
+VF("dr","Le point (1 ; 1) appartient à la droite 3x − 2y − 1 = 0.",true,"Vrai : 3 − 2 − 1 = 0.");
+
+Q("met","Pour montrer que ABC est rectangle en A, on vérifie que…",[`${V("AB")} · ${V("AC")} = 0`,`${V("AB")} et ${V("AC")} sont colinéaires`,"AB = AC",`${V("AB")} + ${V("AC")} = ${V("0")}`],"Angle droit en A ⟺ produit scalaire nul.");
+Q("met","Pour trouver D tel que ABCD soit un parallélogramme, on utilise…",[`${V("AB")} = ${V("DC")}`,`${V("AB")} = ${V("CD")}`,`${V("AB")} = ${V("CA")}`,`${V("AC")} = ${V("BD")}`],"Attention à l’ordre des lettres : AB = DC.");
+Q("met","Pour trouver l’intersection de deux droites, on…",["résout le système formé par leurs deux équations","calcule le produit scalaire de leurs vecteurs normaux","additionne leurs vecteurs directeurs","calcule la distance entre elles"],"Le point d’intersection vérifie les deux équations à la fois.");
+VF("met",`Dans un parallélogramme ABCD, ${V("AB")} = ${V("CD")}.`,false,`Faux : ${V("AB")} = ${V("DC")}. ${V("CD")} est l’opposé.`);
+VF("met",`Les composantes de ${V("AB")} et les coordonnées du milieu de [AB] se calculent avec la même formule.`,false,"Faux : soustraction pour le vecteur, addition divisée par 2 pour le milieu.");
+VF("met","Si deux droites ont des vecteurs directeurs colinéaires, elles sont parallèles (ou confondues).",true,"Vrai : même direction.");
+
+/* ================= EXERCICES GÉNÉRÉS ================= */
+const YN=["Oui","Non"];
+const L_=s=>`<div class="l">${s}</div>`;
+const chkVec=(ax,ay)=>v=>near(v[0],ax)&&near(v[1],ay);
+const chkCol=(ax,ay)=>v=>!(near(v[0],0)&&near(v[1],0))&&near(v[0]*ay-v[1]*ax,0);
+const chkNum=(a,t=1e-6)=>v=>near(v[0],a,t);
+function randPt(a=-5,b=5){return[ri(a,b),ri(a,b)]}
+function randV(a=-5,b=5){let x,y;do{x=ri(a,b);y=ri(a,b)}while(!x&&!y);return[x,y]}
+const GEN=[
+ {id:"g:chasles",ch:"vec",t:"Relation de Chasles",d:"Simplifie une somme de vecteurs.",make(){
+  const[a,b,c,d]=pick(["ABCD","MNPQ","EFGH","RSTU"]).split(""),tp=ri(0,4);let e,ans,sol;
+  if(tp===0){e=`${V(a+b)} + ${V(b+c)}`;ans=a+c;sol=`La lettre du milieu (${b}) est la même : elle disparaît. ${V(a+b)} + ${V(b+c)} = ${V(a+c)}.`}
+  if(tp===1){e=`${V(a+b)} + ${V(b+c)} + ${V(c+d)}`;ans=a+d;sol=`Chasles deux fois : ${V(a+b)} + ${V(b+c)} = ${V(a+c)}, puis ${V(a+c)} + ${V(c+d)} = ${V(a+d)}.`}
+  if(tp===2){e=`${V(a+b)} − ${V(c+b)}`;ans=a+c;sol=`Soustraire ${V(c+b)}, c’est ajouter son opposé ${V(b+c)}. Donc ${V(a+b)} + ${V(b+c)} = ${V(a+c)}.`}
+  if(tp===3){e=`${V(a+b)} + ${V(c+a)}`;ans=c+b;sol=`On change l’ordre (commutativité) : ${V(c+a)} + ${V(a+b)} = ${V(c+b)}.`}
+  if(tp===4){e=`${V(a+b)} + ${V(b+a)}`;ans="0";sol=`${V(a+b)} + ${V(b+a)} = ${V(a+a)} = ${V("0")} : un vecteur plus son opposé donne le vecteur nul.`}
+  const H=x=>x==="0"?`${V("0")} (vecteur nul)`:V(x);
+  const L=tp===1?[a,b,c,d]:[a,b,c],pool=[];L.forEach(p=>L.forEach(q=>{if(p!==q)pool.push(p+q)}));pool.push("0");
+  const rev=ans==="0"?a+c:ans[1]+ans[0];const ds=[rev,...shuffle(pool.filter(x=>x!==ans&&x!==rev))].slice(0,3);
+  return{q:`Simplifie : ${e}`,choices:shuffle([ans,...ds].map(H)),ans:H(ans),sol}}},
+ {id:"g:calc",ch:"vec",t:"Combinaison de vecteurs",d:"Calcule les coordonnées de α·u + β·v.",make(){
+  const[ux,uy]=randV(),[vx,vy]=randV(),al=pick([1,2,3,-1,-2]),be=pick([1,-1,2,-2,3]);const wx=al*ux+be*vx,wy=al*uy+be*vy;
+  return{q:`On donne ${V("u")}${C2(ux,uy)} et ${V("v")}${C2(vx,vy)}. Calcule les coordonnées de ${V("w")} = ${comb(al,"u",be,"v")}.`,lay:"vec",lab:V("w"),check:chkVec(wx,wy),ansTxt:C2(wx,wy),
+   sol:`On applique les coefficients à chaque composante :`+L_(`x = ${F(al)} × ${par(ux)} + ${par(be)} × ${par(vx)} = ${F(al*ux)} + ${par(be*vx)} = ${F(wx)}`)+L_(`y = ${F(al)} × ${par(uy)} + ${par(be)} × ${par(vy)} = ${F(al*uy)} + ${par(be*vy)} = ${F(wy)}`)+`Donc ${V("w")}${C2(wx,wy)}.`}}},
+ {id:"g:pt",ch:"vec",t:"Placer un point",d:"Trouve B quand on connaît A et le vecteur AB.",make(){
+  const[xa,ya]=randPt(),[ux,uy]=randV(-6,6);const xb=xa+ux,yb=ya+uy;
+  return{q:`On donne A${C2(xa,ya)} et ${V("AB")}${C2(ux,uy)}. Calcule les coordonnées de B.`,lay:"vec",lab:"B",check:chkVec(xb,yb),ansTxt:`B${C2(xb,yb)}`,
+   sol:`${V("AB")} = (${xB} − ${xA} ; ${yB} − ${yA}), donc ${xB} = ${xA} + ${F(ux)} et ${yB} = ${yA} + ${F(uy)}.`+L_(`${xB} = ${F(xa)} + ${par(ux)} = ${F(xb)}`)+L_(`${yB} = ${F(ya)} + ${par(uy)} = ${F(yb)}`)}}},
+
+ {id:"g:ab",ch:"rep",t:"Composantes d’un vecteur",d:"Calcule AB à partir de A et B.",make(){
+  const[xa,ya]=randPt(-6,6);let xb,yb;do{[xb,yb]=randPt(-6,6)}while(xb===xa&&yb===ya);const dx=xb-xa,dy=yb-ya;
+  return{q:`On donne A${C2(xa,ya)} et B${C2(xb,yb)}. Calcule les composantes de ${V("AB")}.`,lay:"vec",lab:V("AB"),check:chkVec(dx,dy),ansTxt:C2(dx,dy),
+   sol:`Arrivée moins départ :`+L_(`${V("AB")} = (${F(xb)} − ${par(xa)} ; ${F(yb)} − ${par(ya)}) = ${C2(dx,dy)}`)}}},
+ {id:"g:mil",ch:"rep",t:"Milieu d’un segment",d:"Calcule les coordonnées du milieu M de [AB].",make(){
+  const[xa,ya]=randPt(-6,6),[xb,yb]=randPt(-6,6);const mx=(xa+xb)/2,my=(ya+yb)/2;
+  return{q:`On donne A${C2(xa,ya)} et B${C2(xb,yb)}. Calcule les coordonnées du milieu M de [AB].`,lay:"vec",lab:"M",check:chkVec(mx,my),ansTxt:`M${C2(mx,my)}`,hint:"Tu peux écrire 2,5 ou 5/2.",
+   sol:`On additionne puis on divise par 2 :`+L_(`M = ((${F(xa)} + ${par(xb)}) / 2 ; (${F(ya)} + ${par(yb)}) / 2) = (${F(xa+xb)}/2 ; ${F(ya+yb)}/2) = ${C2(mx,my)}`)}}},
+ {id:"g:norm",ch:"rep",t:"Norme d’un vecteur",d:"Calcule ‖u‖ avec Pythagore.",make(){
+  let x,y;if(Math.random()<.45){[x,y]=pick([[3,4],[4,3],[6,8],[8,6],[5,12],[12,5],[0,5],[2,0]]);x*=pick([1,-1]);y*=pick([1,-1])}else[x,y]=randV(-7,7);const n2=x*x+y*y;
+  return{q:`Calcule la norme de ${V("u")}${C2(x,y)}.`,lay:"num",lab:`‖${V("u")}‖`,check:chkNum(Math.sqrt(n2),.011),ansTxt:rootTxt(n2).split(" = ").pop(),hint:"Valeur exacte (ex. √20 ou 2√5) ou arrondie au centième (4,47).",
+   sol:L_(`‖${V("u")}‖ = √(${par(x)}² + ${par(y)}²) = √(${x*x} + ${y*y}) = ${rootTxt(n2)}`)}}},
+ {id:"g:dist",ch:"rep",t:"Distance entre deux points",d:"Calcule la longueur AB.",make(){
+  const[xa,ya]=randPt(-5,5);let xb,yb;do{[xb,yb]=randPt(-5,5)}while(xb===xa&&yb===ya);const dx=xb-xa,dy=yb-ya,n2=dx*dx+dy*dy;
+  return{q:`On donne A${C2(xa,ya)} et B${C2(xb,yb)}. Calcule la distance AB.`,lay:"num",lab:"AB",check:chkNum(Math.sqrt(n2),.011),ansTxt:rootTxt(n2).split(" = ").pop(),hint:"Valeur exacte (ex. √34) ou arrondie au centième (5,83).",
+   sol:`On calcule d’abord ${V("AB")}${C2(dx,dy)}, puis sa norme :`+L_(`AB = √(${par(dx)}² + ${par(dy)}²) = √(${dx*dx} + ${dy*dy}) = ${rootTxt(n2)}`)}}},
+ {id:"g:read",ch:"rep",t:"Lecture graphique",d:"Lis A et B sur le repère, puis donne AB.",make(){
+  const[xa,ya]=[ri(-4,5),ri(-3,4)];let xb,yb;do{xb=ri(-4,5);yb=ri(-3,4)}while(Math.abs(xb-xa)+Math.abs(yb-ya)<3);const dx=xb-xa,dy=yb-ya;
+  return{q:`Lis les coordonnées de A et B sur le graphique, puis donne les composantes de ${V("AB")}.`,fig:G({xr:[-5,6],yr:[-4,5],vecs:[[xa,ya,xb,yb,"k5",""]],pts:[["A",xa,ya,"b"],["B",xb,yb]]}),lay:"vec",lab:V("AB"),check:chkVec(dx,dy),ansTxt:C2(dx,dy),
+   sol:`On lit A${C2(xa,ya)} et B${C2(xb,yb)}.`+L_(`${V("AB")} = (${F(xb)} − ${par(xa)} ; ${F(yb)} − ${par(ya)}) = ${C2(dx,dy)}`)+`Vérification sur la figure : on se déplace de ${F(dx)} horizontalement et de ${F(dy)} verticalement.`}}},
+
+ {id:"g:colyn",ch:"col",t:"Colinéaires ou pas ?",d:"Teste deux vecteurs avec le produit en croix.",make(){
+  let u,v;if(Math.random()<.5){const w=randV(-3,3),k1=rnz(-2,2),k2=pick([-3,-2,2,3]);u=[k1*w[0],k1*w[1]];v=[k2*w[0],k2*w[1]]}else{do{u=randV(-6,6);v=randV(-6,6)}while(u[0]*v[1]-v[0]*u[1]===0)}
+  const d=u[0]*v[1]-v[0]*u[1];
+  return{q:`${V("u")}${C2(...u)} et ${V("v")}${C2(...v)} sont-ils colinéaires ?`,choices:YN,ans:d===0?"Oui":"Non",ansTxt:d===0?"Oui":"Non",
+   sol:L_(`x·y' − x'·y = ${par(u[0])} × ${par(v[1])} − ${par(v[0])} × ${par(u[1])} = ${F(u[0]*v[1])} − ${par(v[0]*u[1])} = ${F(d)}`)+(d===0?"Le résultat est nul : ils sont colinéaires.":"Le résultat n’est pas nul : ils ne sont pas colinéaires.")}}},
+ {id:"g:colm",ch:"col",t:"Trouver m (colinéarité)",d:"Trouve la valeur qui rend deux vecteurs colinéaires.",make(){
+  const k=pick([-3,-2,-1,2,3]),b=rnz(-5,5),c=rnz(-5,5),m=k*b,a=k*c;
+  return{q:`Trouve m pour que ${V("u")}(m ; ${F(a)}) et ${V("v")}${C2(b,c)} soient colinéaires.`,lay:"num",lab:"m",check:chkNum(m),ansTxt:`m = ${F(m)}`,
+   sol:`On écrit la condition x·y' − x'·y = 0 :`+L_(`m × ${par(c)} − ${par(b)} × ${par(a)} = 0`)+L_(`${cx(c)}m = ${F(a*b)}  ⇒  m = ${F(a*b)} / ${par(c)} = ${F(m)}`)+`Vérification : ${V("u")} = ${F(k)}·${V("v")}.`}}},
+ {id:"g:align",ch:"col",t:"Points alignés ?",d:"Teste si A, B et C sont sur une même droite.",make(){
+  const A=randPt(-4,4),[p,q]=randV(-3,3),t=pick([2,-1,3,-2]),yes=Math.random()<.5;let C=[A[0]+t*p,A[1]+t*q];if(!yes){if(p!==0)C[1]+=1;else C[0]+=1}
+  const B=[A[0]+p,A[1]+q],ac=[C[0]-A[0],C[1]-A[1]],d=p*ac[1]-ac[0]*q;
+  return{q:`A${C2(...A)}, B${C2(...B)} et C${C2(...C)} sont-ils alignés ?`,choices:YN,ans:d===0?"Oui":"Non",ansTxt:d===0?"Oui":"Non",
+   sol:`On compare ${V("AB")} et ${V("AC")} :`+L_(`${V("AB")}${C2(p,q)}   ${V("AC")}${C2(...ac)}`)+L_(`${par(p)} × ${par(ac[1])} − ${par(ac[0])} × ${par(q)} = ${F(d)}`)+(d===0?"Nul : les vecteurs sont colinéaires, donc A, B, C sont alignés.":"Non nul : A, B, C ne sont pas alignés.")+G({...autoR([A,B,C]),pts:[["A",...A,"b"],["B",...B,"b"],["C",...C,"b"]],lines:d===0?[[q,-p,-(q*A[0]-p*A[1]),"k2",""]]:[]})}}},
+ {id:"g:par",ch:"col",t:"Droites parallèles ?",d:"Compare les vecteurs AB et CD.",make(){
+  const A=randPt(-4,4),[p,q]=randV(-3,3),B=[A[0]+p,A[1]+q],C=randPt(-4,4),k=pick([2,-1,-2,3]),yes=Math.random()<.5;let cd=[k*p,k*q];if(!yes){if(p!==0)cd[1]+=pick([1,-1]);else cd[0]+=1}
+  const D=[C[0]+cd[0],C[1]+cd[1]],d=p*cd[1]-cd[0]*q;
+  return{q:`A${C2(...A)}, B${C2(...B)}, C${C2(...C)}, D${C2(...D)}. Les droites (AB) et (CD) sont-elles parallèles ?`,choices:YN,ans:d===0?"Oui":"Non",ansTxt:d===0?"Oui":"Non",
+   sol:L_(`${V("AB")}${C2(p,q)}   ${V("CD")}${C2(...cd)}`)+L_(`${par(p)} × ${par(cd[1])} − ${par(cd[0])} × ${par(q)} = ${F(d)}`)+(d===0?"Vecteurs colinéaires : (AB) ∥ (CD).":"Vecteurs non colinéaires : les droites ne sont pas parallèles.")}}},
+
+ {id:"g:ps",ch:"ps",t:"Produit scalaire",d:"Calcule u · v avec les coordonnées.",make(){
+  const u=randV(-6,6),v=randV(-6,6),p=u[0]*v[0]+u[1]*v[1];
+  return{q:`Calcule ${V("u")} · ${V("v")} pour ${V("u")}${C2(...u)} et ${V("v")}${C2(...v)}.`,lay:"num",lab:`${V("u")} · ${V("v")}`,check:chkNum(p),ansTxt:F(p),
+   sol:L_(`${V("u")} · ${V("v")} = ${par(u[0])} × ${par(v[0])} + ${par(u[1])} × ${par(v[1])} = ${F(u[0]*v[0])} + ${par(u[1]*v[1])} = ${F(p)}`)}}},
+ {id:"g:orth",ch:"ps",t:"Orthogonaux ou pas ?",d:"Vérifie si deux vecteurs sont perpendiculaires.",make(){
+  const u=randV(-5,5);let v;if(Math.random()<.5){const t=pick([1,-1,2,-2]);v=[-t*u[1],t*u[0]]}else{do{v=randV(-6,6)}while(u[0]*v[0]+u[1]*v[1]===0)}
+  const p=u[0]*v[0]+u[1]*v[1];
+  return{q:`${V("u")}${C2(...u)} et ${V("v")}${C2(...v)} sont-ils orthogonaux ?`,choices:YN,ans:p===0?"Oui":"Non",ansTxt:p===0?"Oui":"Non",
+   sol:L_(`${V("u")} · ${V("v")} = ${par(u[0])} × ${par(v[0])} + ${par(u[1])} × ${par(v[1])} = ${F(u[0]*v[0])} + ${par(u[1]*v[1])} = ${F(p)}`)+(p===0?"Produit scalaire nul : ils sont orthogonaux.":"Produit scalaire non nul : ils ne sont pas orthogonaux.")}}},
+ {id:"g:psm",ch:"ps",t:"Trouver m (orthogonalité)",d:"Trouve la valeur qui rend deux vecteurs perpendiculaires.",make(){
+  const m=rnz(-5,5),b=rnz(-5,5),P=-m*b,dv=[];for(let i=1;i<=Math.abs(P);i++)if(Math.abs(P)%i===0&&i<=8)dv.push(i);const a=pick(dv)*pick([1,-1]),c=P/a;
+  return{q:`Trouve m pour que ${V("u")}(m ; ${F(a)}) et ${V("v")}${C2(b,c)} soient orthogonaux.`,lay:"num",lab:"m",check:chkNum(m),ansTxt:`m = ${F(m)}`,
+   sol:`On écrit ${V("u")} · ${V("v")} = 0 :`+L_(`m × ${par(b)} + ${par(a)} × ${par(c)} = 0`)+L_(`${cx(b)}m + ${par(a*c)} = 0  ⇒  ${cx(b)}m = ${F(-a*c)}  ⇒  m = ${F(m)}`)}}},
+
+ {id:"g:dir",ch:"dr",t:"Vecteur directeur",d:"Lis un vecteur directeur dans ax + by + c = 0.",make(){
+  let a,b;do{a=ri(-6,6);b=ri(-6,6)}while(!a&&!b);const c=ri(-9,9);
+  return{q:`Donne un vecteur directeur de la droite d : ${eqS(a,b,c)}.`,lay:"vec",lab:V("v"),check:chkCol(-b,a),ansTxt:`${C2(-b,a)} (ou tout vecteur colinéaire non nul)`,
+   sol:`Ici a = ${F(a)} et b = ${F(b)}. Un vecteur directeur est (−b ; a) :`+L_(`${V("v")}(−(${F(b)}) ; ${F(a)}) = ${C2(-b,a)}`)+`Tout vecteur colinéaire non nul est aussi accepté.`}}},
+ {id:"g:nor",ch:"dr",t:"Vecteur normal",d:"Lis un vecteur normal dans ax + by + c = 0.",make(){
+  let a,b;do{a=ri(-6,6);b=ri(-6,6)}while(!a&&!b);const c=ri(-9,9);
+  return{q:`Donne un vecteur normal à la droite d : ${eqS(a,b,c)}.`,lay:"vec",lab:V("n"),check:chkCol(a,b),ansTxt:`${C2(a,b)} (ou tout vecteur colinéaire non nul)`,
+   sol:`Le vecteur normal se lit directement : ${V("n")}(a ; b) = ${C2(a,b)}.`}}},
+ {id:"g:eq",ch:"dr",t:"Équation cartésienne",d:"Trouve ax + by + c = 0 avec un point et un vecteur.",make(){
+  const A=randPt(-4,4),[d1,d2]=randV(-4,4),a=d2,b=-d1,c=-(a*A[0]+b*A[1]);
+  return{q:`Donne une équation cartésienne de la droite passant par A${C2(...A)} et dirigée par ${V("v")}${C2(d1,d2)}.`,lay:"eq",check:v=>!(near(v[0],0)&&near(v[1],0))&&near(v[0]*b-v[1]*a,0)&&near(v[0]*c-v[2]*a,0)&&near(v[1]*c-v[2]*b,0),ansTxt:`${eqS(a,b,c)} (ou une équation proportionnelle)`,
+   sol:`${V("v")}(−b ; a) = ${C2(d1,d2)}, donc a = ${F(a)} et b = ${F(b)} :`+L_(`${eqS(a,b,0).replace(" = 0","")} + c = 0`)+`A est sur la droite :`+L_(`${F(a)} × ${par(A[0])} + ${par(b)} × ${par(A[1])} + c = 0  ⇒  ${F(a*A[0]+b*A[1])} + c = 0  ⇒  c = ${F(c)}`)+`Réponse : ${eqS(a,b,c)}.`}}},
+ {id:"g:param",ch:"dr",t:"Système paramétrique",d:"Calcule le point obtenu pour une valeur de k.",make(){
+  const A=randPt(-4,4),[d1,d2]=randV(-4,4),k=pick([-2,-1,2,3]),P=[A[0]+k*d1,A[1]+k*d2];
+  return{q:`La droite d a pour système paramétrique ${sysS(A[0],A[1],d1,d2)}. Donne le point P obtenu pour k = ${F(k)}.`,lay:"vec",lab:"P",check:chkVec(...P),ansTxt:`P${C2(...P)}`,
+   sol:`On remplace k par ${F(k)} :`+L_(`x = ${F(A[0])} + ${par(k)} × ${par(d1)} = ${F(P[0])}`)+L_(`y = ${F(A[1])} + ${par(k)} × ${par(d2)} = ${F(P[1])}`)}}},
+ {id:"g:belong",ch:"dr",t:"Le point est-il sur la droite ?",d:"Remplace x et y dans l’équation.",make(){
+  let a,b;do{a=ri(-5,5);b=ri(-5,5)}while(!a&&!b);const P0=randPt(-3,3),c=-(a*P0[0]+b*P0[1]),t=pick([1,-1,2]),yes=Math.random()<.5;
+  const Q=[P0[0]-t*b,P0[1]+t*a];if(!yes){if(a!==0)Q[0]+=1;else Q[1]+=1}const val=a*Q[0]+b*Q[1]+c;
+  return{q:`Le point P${C2(...Q)} appartient-il à la droite d : ${eqS(a,b,c)} ?`,choices:YN,ans:val===0?"Oui":"Non",ansTxt:val===0?"Oui":"Non",
+   sol:`On remplace x par ${F(Q[0])} et y par ${F(Q[1])} :`+L_(`${F(a)} × ${par(Q[0])} + ${par(b)} × ${par(Q[1])} + ${par(c)} = ${F(val)}`)+(val===0?"On obtient 0 : P est sur d.":"On n’obtient pas 0 : P n’est pas sur d.")}}},
+
+ {id:"g:rect",ch:"met",t:"Triangle rectangle en A ?",d:"Calcule AB · AC.",make(){
+  const A=randPt(-3,3),[p,q]=randV(-4,4),yes=Math.random()<.5;let ac;if(yes){const t=pick([1,-1,2]);ac=[-t*q,t*p]}else{do{ac=randV(-4,4)}while(p*ac[0]+q*ac[1]===0||p*ac[1]-q*ac[0]===0)}
+  const B=[A[0]+p,A[1]+q],C=[A[0]+ac[0],A[1]+ac[1]],s=p*ac[0]+q*ac[1];
+  return{q:`A${C2(...A)}, B${C2(...B)}, C${C2(...C)}. Le triangle ABC est-il rectangle en A ?`,choices:YN,ans:s===0?"Oui":"Non",ansTxt:s===0?"Oui":"Non",
+   sol:L_(`${V("AB")}${C2(p,q)}   ${V("AC")}${C2(...ac)}`)+L_(`${V("AB")} · ${V("AC")} = ${par(p)} × ${par(ac[0])} + ${par(q)} × ${par(ac[1])} = ${F(s)}`)+(s===0?"Produit scalaire nul : ABC est rectangle en A.":"Produit scalaire non nul : ABC n’est pas rectangle en A.")+
+   G({...autoR([A,B,C]),polys:[[[A,B,C],"k6"]],ra:s===0?[[A[0],A[1],p,q,ac[0],ac[1]]]:[],pts:[["A",...A,"b"],["B",...B],["C",...C]]})}}},
+ {id:"g:para",ch:"met",t:"Parallélogramme ABCD",d:"Trouve D avec AB = DC.",make(){
+  let A,B,C;do{A=randPt(-4,4);B=randPt(-4,4);C=randPt(-4,4)}while((B[0]-A[0])*(C[1]-A[1])-(C[0]-A[0])*(B[1]-A[1])===0);const D=[A[0]+C[0]-B[0],A[1]+C[1]-B[1]],ab=[B[0]-A[0],B[1]-A[1]];
+  return{q:`A${C2(...A)}, B${C2(...B)}, C${C2(...C)}. Trouve les coordonnées de D pour que ABCD soit un parallélogramme.`,lay:"vec",lab:"D",check:chkVec(...D),ansTxt:`D${C2(...D)}`,
+   sol:`ABCD parallélogramme ⟺ ${V("AB")} = ${V("DC")}.`+L_(`${V("AB")}${C2(...ab)}   ${V("DC")}(${F(C[0])} − x<sub>D</sub> ; ${F(C[1])} − y<sub>D</sub>)`)+L_(`${F(C[0])} − x<sub>D</sub> = ${F(ab[0])}  ⇒  x<sub>D</sub> = ${F(D[0])}`)+L_(`${F(C[1])} − y<sub>D</sub> = ${F(ab[1])}  ⇒  y<sub>D</sub> = ${F(D[1])}`)+
+   G({...autoR([A,B,C,D]),polys:[[[A,B,C,D],"k6"]],pts:[["A",...A],["B",...B],["C",...C],["D",...D]]})}}},
+ {id:"g:inter",ch:"met",t:"Intersection de deux droites",d:"Résous le système des deux équations.",make(){
+  let a1,b1,a2,b2;do{a1=rnz(-4,4);b1=rnz(-4,4);a2=rnz(-4,4);b2=rnz(-4,4)}while(a1*b2-a2*b1===0);const x0=ri(-4,4),y0=ri(-4,4),c1=-(a1*x0+b1*y0),c2=-(a2*x0+b2*y0);
+  const Bc=a2*b1-a1*b2,Cc=a2*c1-a1*c2;
+  return{q:`Détermine le point d’intersection I des droites d₁ : ${eqS(a1,b1,c1)} et d₂ : ${eqS(a2,b2,c2)}.`,lay:"vec",lab:"I",check:chkVec(x0,y0),ansTxt:`I${C2(x0,y0)}`,
+   sol:`On élimine x : on multiplie d₁ par ${par(a2)} et d₂ par ${par(a1)}, puis on soustrait.`+L_(`(${F(a2*b1)} − ${par(a1*b2)})·y + (${F(a2*c1)} − ${par(a1*c2)}) = 0  ⇒  ${cx(Bc)}y ${Cc<0?"− "+F(-Cc):"+ "+F(Cc)} = 0  ⇒  y = ${F(y0)}`)+`On remplace dans d₁ :`+L_(`${cx(a1)}x + ${par(b1)} × ${par(y0)} + ${par(c1)} = 0  ⇒  ${cx(a1)}x = ${F(-(b1*y0+c1))}  ⇒  x = ${F(x0)}`)+`Les droites se coupent en I${C2(x0,y0)}.`+
+   G({...autoR([[x0,y0]],8),lines:[[a1,b1,c1,"k4","d₁"],[a2,b2,c2,"k1","d₂"]],pts:[["I",x0,y0]]})}}}
+];
+const GENM=Object.fromEntries(GEN.map(g=>[g.id,g]));
+const FLASH=[
+ ["vec","Les 3 caractéristiques d’un vecteur","direction · sens · norme"],
+ ["vec","Relation de Chasles",`${V("AB")} + ${V("BC")} = ${V("AC")}`],
+ ["vec",`Opposé de ${V("AB")}`,`${V("BA")} = −${V("AB")}`],
+ ["rep",`Composantes de ${V("AB")}`,`(${xB} − ${xA} ; ${yB} − ${yA})`],
+ ["rep","Milieu M de [AB]",`((${xA} + ${xB})/2 ; (${yA} + ${yB})/2)`],
+ ["rep",`Norme de ${V("u")}(x ; y)`,"√(x² + y²)"],
+ ["rep","Distance AB",`√((${xB} − ${xA})² + (${yB} − ${yA})²)`],
+ ["col","Condition de colinéarité","x·y' − x'·y = 0"],
+ ["col","A, B, C alignés ⟺",`${V("AB")} et ${V("AC")} colinéaires`],
+ ["col","(AB) ∥ (CD) ⟺",`${V("AB")} et ${V("CD")} colinéaires`],
+ ["ps","Produit scalaire cartésien",`${V("u")} · ${V("v")} = x·x' + y·y'`],
+ ["ps",`${V("u")} ⊥ ${V("v")} ⟺`,"x·x' + y·y' = 0"],
+ ["dr","Équation vectorielle de d (A, v)",`${V("AP")} = k·${V("v")}`],
+ ["dr","Système paramétrique",`{ x = ${xA} + k·d₁ ; y = ${yA} + k·d₂ }`],
+ ["dr","Vecteur directeur de ax + by + c = 0",`${V("v")}(−b ; a)`],
+ ["dr","Vecteur normal de ax + by + c = 0",`${V("n")}(a ; b)`],
+ ["met","Triangle ABC rectangle en A",`${V("AB")} · ${V("AC")} = 0`],
+ ["met","Parallélogramme ABCD",`${V("AB")} = ${V("DC")}`],
+ ["met","Intersection de deux droites","résoudre le système des deux équations"]
+].map((f,i)=>({id:"f"+i,ch:f[0],front:f[1],back:f[2]}));
+const SKILLS=[
+ ["vec","Simplifier une somme de vecteurs avec Chasles"],
+ ["vec","Utiliser l’opposé et le vecteur nul"],
+ ["rep","Calculer les composantes d’un vecteur AB"],
+ ["rep","Calculer le milieu d’un segment sans le confondre avec AB"],
+ ["rep","Calculer une norme et une distance"],
+ ["col","Tester la colinéarité sans erreur de signe"],
+ ["col","Montrer que trois points sont alignés ou que deux droites sont parallèles"],
+ ["ps","Calculer un produit scalaire"],
+ ["ps","Montrer que deux vecteurs sont orthogonaux"],
+ ["dr","Écrire une équation vectorielle et paramétrique"],
+ ["dr","Lire un vecteur directeur et un vecteur normal"],
+ ["dr","Trouver une équation cartésienne"],
+ ["met","Démontrer qu’un triangle est rectangle"],
+ ["met","Trouver le 4e sommet d’un parallélogramme"],
+ ["met","Déterminer l’intersection de deux droites"]
+].map((s,i)=>({id:"s"+i,ch:s[0],t:s[1]}));
+
+/* ================= PROGRESSION ================= */
+const KEY="vecteurs-progress-v1";
+const blank=()=>({v:1,upd:0,items:{},read:{},skills:{},log:[],days:{}});
+let S=blank();
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(blank(),JSON.parse(r))}catch(e){}
+let cloudRef=null,cloudBusy=false,cloudAgain=false,saveT=null;
+function save(){S.upd=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(saveT);saveT=setTimeout(pushCloud,1200);renderSide()}
+async function pushCloud(){if(!cloudRef)return;if(cloudBusy){cloudAgain=true;return}cloudBusy=true;try{await cloudRef.set(JSON.parse(JSON.stringify(S)))}catch(e){}cloudBusy=false;if(cloudAgain){cloudAgain=false;pushCloud()}}
+async function initCloud(){
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const[user,db]=await Promise.all([window.claude.use("user"),window.claude.use("db")]);
+    if(!user||!db)return;const id=await user.id();if(!id)return;
+    const ref=db.doc("data/users/"+id+"/progress");const snap=await ref.get();cloudRef=ref;
+    if(snap.exists){const d=snap.data()||{};
+      if((d.upd||0)>(S.upd||0)){S=Object.assign(blank(),JSON.parse(JSON.stringify(d)));try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(!SESSION)route()}
+      else if((S.upd||0)>(d.upd||0))pushCloud();
+    }else if(S.upd)pushCloud();
+    renderSide();
+  }catch(e){cloudRef=null}
+}
+function record(id,ok){const it=S.items[id]||{b:0,c:0,w:0,t:0};if(ok){it.b=Math.min(4,it.b+1);it.c++}else{it.b=0;it.w++}it.t=Date.now();S.items[id]=it;const d=today();S.days[d]=(S.days[d]||0)+1;save()}
+function logSession(k,n,s,tot,chs){S.log.push({t:Date.now(),k,n,s,tot,ch:chs});if(S.log.length>150)S.log=S.log.slice(-150);save()}
+const mIt=id=>{const it=S.items[id];return it?Math.min(it.b,3)/3:0};
+const PRACT=[...BANK.map(q=>({id:q.id,ch:q.ch})),...GEN.map(g=>({id:g.id,ch:g.ch}))];
+function chItems(ch){return[...PRACT.filter(q=>q.ch===ch).map(q=>q.id),...FLASH.filter(f=>f.ch===ch).map(f=>f.id)]}
+function chMastery(ch){const a=chItems(ch);return a.reduce((s,id)=>s+mIt(id),0)/a.length}
+const chRead=ch=>SECS[ch].filter(s=>S.read[ch+"/"+s]).length;
+function chScore(ch){return Math.round(100*(.8*chMastery(ch)+.2*chRead(ch)/SECS[ch].length))}
+const overall=()=>Math.round(CH.reduce((s,c)=>s+chScore(c.id),0)/CH.length);
+const INT=[0,4e7,1.7e8,4.3e8,1e9];
+const isErr=id=>{const it=S.items[id];return it&&it.b===0&&it.w>0};
+const isDue=id=>{const it=S.items[id];return it&&it.b>0&&Date.now()-it.t>INT[it.b]};
+const errCount=()=>PRACT.filter(q=>isErr(q.id)).length;
+function streak(){let n=0;const d=new Date();if(!S.days[dkey(d)])d.setDate(d.getDate()-1);while(S.days[dkey(d)]){n++;d.setDate(d.getDate()-1)}return n}
+const answered=()=>Object.values(S.items).reduce((s,i)=>s+i.c+i.w,0);
+
+/* ================= ICÔNES ================= */
+const sv=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const IC={
+ home:sv('<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
+ book:sv('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/>'),
+ dumb:sv('<path d="M4 20L20 4"/><path d="M13 4h7v7"/><path d="M4 12v8h8"/>'),
+ exam:sv('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M10 2h4"/>'),
+ chart:sv('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+ bolt:sv('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'),
+ list:sv('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>'),
+ cards:sv('<rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v12"/>'),
+ calc:sv('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/>')
+};
+const NAV=[["accueil","Accueil",IC.home],["cours","Cours",IC.book],["entrainement","S’entraîner",IC.dumb],["examen","Interro blanche",IC.exam],["progres","Progrès",IC.chart]];
+const brandSvg=`<svg class="brand-mark" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="var(--ink)"/><path d="M10 30L27 13" stroke="var(--bg)" stroke-width="3" stroke-linecap="round"/><path d="M19 12h10v10" stroke="var(--bg)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="30" r="3" fill="var(--rep)"/></svg>`;
+
+/* ================= SHELL ================= */
+let CUR="accueil";
+function renderSide(){
+  const top=CUR.split("-")[0];
+  $("#side").innerHTML=`<a class="brand" href="#accueil">${brandSvg}<div><b>Vecteurs & droites</b><span>Géométrie analytique</span></div></a>
+  <nav class="nav">${NAV.map(n=>`<a href="#${n[0]}" class="${top===n[0]?"on":""}">${n[2]}${n[1]}</a>`).join("")}</nav>
+  <div><div class="side-h">Chapitres</div><div class="side-ch">${CH.map(c=>{const v=chScore(c.id);return `<a href="#cours-${c.id}" data-ch="${c.id}"><span>${c.short}</span><span>${v} %</span><div class="bar"><i style="width:${v}%"></i></div></a>`}).join("")}</div></div>
+  <div class="sync ${cloudRef?"ok":""}"><i></i>${cloudRef?"Progression enregistrée sur ton compte":"Progression enregistrée dans ce navigateur"}</div>`;
+  $("#tabs").innerHTML=NAV.map(n=>`<a href="#${n[0]}" class="${top===n[0]?"on":""}">${n[2]}${n[0]==="examen"?"Interro":n[1]}</a>`).join("");
+}
+function show(h){$("#main").innerHTML=h;window.scrollTo(0,0)}
+
+/* ================= ACCUEIL ================= */
+function ring(v){const r=46,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 118 118"><circle cx="59" cy="59" r="${r}" fill="none" stroke-width="12" class="bgc"/>${v?`<circle cx="59" cy="59" r="${r}" fill="none" stroke-width="12" class="fgc" stroke-linecap="round" stroke-dasharray="${(c*v/100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 59 59)"/>`:""}<text x="59" y="66" text-anchor="middle" font-size="24">${v} %</text></svg>`}
+function chart(){
+  const d=S.log.filter(l=>l.tot).slice(-14);
+  if(d.length<2)return `<div class="empty">Ta courbe apparaîtra après deux séries d’exercices.</div>`;
+  const W=520,H=190,l=36,r=12,t=12,b=26,iw=W-l-r,ih=H-t-b,x=i=>l+i*iw/(d.length-1),y=v=>t+ih-ih*v/100;
+  let g="";[0,50,100].forEach(v=>g+=`<line x1="${l}" y1="${y(v)}" x2="${W-r}" y2="${y(v)}" class="gl"/><text x="${l-8}" y="${y(v)+4}" text-anchor="end" class="ax">${v}</text>`);
+  const p=d.map((e,i)=>[x(i),y(Math.round(100*e.s/e.tot))]);
+  g+=`<path d="M${p[0][0]} ${y(0)} L${p.map(q=>q.join(" ")).join(" L")} L${p[p.length-1][0]} ${y(0)}Z" class="ar"/><path d="M${p.map(q=>q.join(" ")).join(" L")}" class="ln"/>`;
+  p.forEach((q,i)=>g+=`<circle cx="${q[0]}" cy="${q[1]}" r="${i===p.length-1?6:4}" class="dt ${d[i].k==="exam"?"ex":""}"><title>${esc(d[i].n)} : ${d[i].s}/${d[i].tot}</title></circle>`);
+  const fd=t=>new Date(t).toLocaleDateString("fr-FR",{day:"numeric",month:"short"});
+  g+=`<text x="${l}" y="${H-6}" class="ax">${fd(d[0].t)}</text><text x="${W-r}" y="${H-6}" text-anchor="end" class="ax">${fd(d[d.length-1].t)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Scores des dernières séries">${g}</svg>`;
+}
+function heat(){const d=new Date();d.setDate(d.getDate()-d.getDay()-7*11);let h="";
+  for(let i=0;i<84;i++){const k=dkey(d),v=S.days[k]||0,lv=v===0?"":v<10?"l1":v<25?"l2":v<50?"l3":"l4";h+=`<i class="${lv}" title="${k} : ${v} réponse(s)"></i>`;d.setDate(d.getDate()+1)}
+  return `<div class="heat">${h}</div>`}
+function vAccueil(){
+  const o=overall(),weak=CH.slice().sort((a,b)=>chScore(a.id)-chScore(b.id))[0],w=chScore(weak.id),err=errCount(),nextRead=SECS[weak.id].length-chRead(weak.id);
+  show(`<div class="head"><p class="eyebrow">Vecteurs · Repères · Colinéarité · Produit scalaire · Droites</p><h1>Révision de l’interro de maths</h1>
+  <p class="lead">Relis le cours avec ses figures, fais des exercices de calcul toujours renouvelés (les nombres changent à chaque fois), puis passe une interro blanche. Chaque réponse fait avancer ta progression.</p></div>
+  <section class="dash-top">
+   <div class="card overall">${ring(o)}<div class="stack" style="gap:12px"><div><h3>Maîtrise globale</h3><p class="small muted">80 % exercices · 20 % lecture du cours</p></div>
+    <div class="stats"><b>${streak()}</b><b>${answered()}</b><b>${err}</b><span>jour(s) de suite</span><span>réponses</span><span>erreur(s) à revoir</span></div></div></div>
+   <div class="card next" data-ch="${weak.id}"><span class="chip">Prochaine étape</span><h3>${weak.name}</h3>
+    <p class="small muted">${w===0?"Tu n’as pas encore commencé ce chapitre.":`Ton chapitre le plus faible (${w} %).`} ${nextRead?`Il te reste ${nextRead} section(s) à lire.`:"Tu as lu tout le cours : place aux exercices."}</p>
+    <div class="row" style="margin-top:12px">${nextRead?`<a class="btn pri" href="#cours-${weak.id}">Lire le cours</a>`:""}<button class="btn ${nextRead?"":"pri"}" data-a="genchx" data-ch2="${weak.id}">Exercices ${weak.short}</button>${err?`<button class="btn" data-a="smart">Revoir mes erreurs</button>`:""}</div></div>
+  </section>
+  <div class="sec-title"><h2>Chapitres</h2><a class="small muted" href="#cours">Tout le cours</a></div>
+  <div class="chcards">${CH.map(chCard).join("")}</div>
+  <div class="grid g2">
+   <div class="card chart"><div class="sec-title"><h3>Scores des dernières séries</h3><span class="small muted">en %</span></div>${chart()}</div>
+   <div class="card"><div class="sec-title"><h3>Activité</h3><span class="small muted">12 dernières semaines</span></div>${heat()}<p class="small muted" style="margin-top:10px">Chaque case est un jour. Plus elle est foncée, plus tu as répondu de questions.</p></div>
+  </div>`);
+}
+function chCard(c){const v=chScore(c.id);return `<a class="chcard" href="#cours-${c.id}" data-ch="${c.id}"><span class="f">${c.f}</span><h3>${c.name}</h3><div class="bar"><i style="width:${v}%"></i></div><div class="meta"><span>Cours lu ${chRead(c.id)}/${SECS[c.id].length}</span><span>${v} %</span></div></a>`}
+
+/* ================= COURS ================= */
+function vCoursList(){show(`<div class="head"><p class="eyebrow">Théorie</p><h1>Le cours</h1><p class="lead">Six chapitres tirés de ta fiche de synthèse. Marque chaque section comme lue quand tu l’as comprise.</p></div><div class="chcards">${CH.map(chCard).join("")}</div>`)}
+const HERO={
+ vec:()=>G({xr:[0,7],yr:[0,5],vecs:[[1,1,5,2,"k1",""],[5,2,3,4,"k1",""],[1,1,3,4,"k2",""]],pts:[["A",1,1,"b"],["B",5,2],["C",3,4]]}),
+ rep:()=>G({xr:[-1,5],yr:[-1,4],vecs:[[1,1,4,3,"k5",""]],pts:[["A",1,1,"b"],["B",4,3]]}),
+ col:()=>G({xr:[0,7],yr:[0,5],vecs:[[1,1,3,2,"k2",""],[2,3,6,5,"k2",""]]}),
+ ps:()=>G({xr:[-2,4],yr:[-1,4],vecs:[[0,0,3,1,"k3",""],[0,0,-1,3,"k1",""]],ra:[[0,0,3,1,-1,3]]}),
+ dr:()=>G({xr:[-1,6],yr:[-1,4],lines:[[1,-2,1,"k4",""]],vecs:[[1,1,3,2,"k1",""]],pts:[["A",1,1,"b"]]}),
+ met:()=>G({xr:[0,7],yr:[0,5],polys:[[[[1,1],[5,1],[6,4],[2,4]],"k6"]],pts:[["A",1,1,"b"],["B",5,1,"b"],["C",6,4],["D",2,4]]})
+};
+function vChapter(ch){
+  const c=CHM[ch];if(!c)return vCoursList();
+  const secs=COURSE[ch](),i=CH.indexOf(c),prev=CH[i-1],next=CH[i+1];
+  show(`<div data-ch="${ch}">
+  <div class="ch-hero"><div class="stack" style="gap:8px"><span class="f">${c.f}</span><h1>${c.name}</h1><p class="muted">${secs.length} sections · ${chRead(ch)} lue(s) · maîtrise ${chScore(ch)} %</p></div><div aria-hidden="true">${HERO[ch]()}</div></div>
+  <nav class="toc">${secs.map((s,k)=>`<a href="#cours-${ch}" data-a="jump" data-s="${s.id}" class="${S.read[ch+"/"+s.id]?"read":""}">${k+1}. ${s.t}</a>`).join("")}</nav>
+  ${secs.map((s,k)=>`<section class="sec" id="s-${s.id}"><h2><span class="n">${i+1}.${k+1}</span>${s.t}</h2>${s.h}
+   <button class="btn sm done ${S.read[ch+"/"+s.id]?"on":""}" data-a="read" data-s="${s.id}">${S.read[ch+"/"+s.id]?"✓ Section lue":"Marquer comme lue"}</button></section>`).join("")}
+  <div class="card stack" style="margin-top:8px"><h3>Teste-toi sur ce chapitre</h3><div class="row">
+   <button class="btn pri" data-a="genchx" data-ch2="${ch}">Exercices de calcul</button><button class="btn" data-a="quizch" data-ch2="${ch}">Questions de cours</button><button class="btn" data-a="flashch" data-ch2="${ch}">Flashcards</button></div></div>
+  <div class="ch-foot">${prev?`<a class="btn" href="#cours-${prev.id}">← ${prev.short}</a>`:"<span></span>"}${next?`<a class="btn" href="#cours-${next.id}">${next.short} →</a>`:""}</div></div>`);
+  Object.keys(LIVE).forEach(runLive);
+}
+
+/* ================= ENTRAÎNEMENT ================= */
+let FIL=new Set(CH.map(c=>c.id));
+function vTrain(){
+  const err=errCount(),due=PRACT.filter(q=>isDue(q.id)).length;
+  const m=(a,ic,t,d,badge,cls="")=>`<button class="mode ${cls}" data-a="${a}"><span class="ic">${ic}</span><b>${t}</b><span>${d}</span>${badge?`<em class="badge">${badge}</em>`:""}</button>`;
+  show(`<div class="head"><p class="eyebrow">Pratique</p><h1>S’entraîner</h1><p class="lead">Choisis les chapitres, puis un mode. Ce que tu rates revient plus souvent, avec de nouveaux nombres.</p></div>
+  <div class="filters"><span class="small muted">Chapitres :</span>${CH.map(c=>`<button class="fchip ${FIL.has(c.id)?"on":""}" data-ch="${c.id}" data-a="fil" data-ch2="${c.id}">${c.short}</button>`).join("")}</div>
+  <div class="modes">
+   ${m("smart",IC.bolt,"Révision intelligente","12 exercices choisis pour toi : erreurs, exercices à revoir, puis nouveautés.",err||due?`${err} erreur(s) · ${due} à revoir`:"","feature")}
+   ${m("genmix",IC.calc,"Série de calculs","10 exercices de calcul variés, corrigés étape par étape.")}
+   ${m("quiz",IC.list,"Questions de cours","10 questions à choix multiples et vrai/faux sur les formules.")}
+   ${m("flash",IC.cards,"Flashcards","Retourne la carte et dis honnêtement si tu connaissais la formule.")}
+  </div>
+  <h2 class="mode-h">Exercices par type</h2>
+  <p class="small muted" style="margin:-4px 0 14px">Chaque type lance 5 exercices. La barre se remplit quand tu en réussis 3 d’affilée.</p>
+  ${CH.filter(c=>FIL.has(c.id)).map(c=>`<div data-ch="${c.id}" style="margin-bottom:18px"><p class="eyebrow" style="color:var(--c);margin-bottom:8px">${c.name}</p><div class="gens">${GEN.filter(g=>g.ch===c.id).map(g=>{const it=S.items[g.id],v=Math.round(100*mIt(g.id));return `<button class="gen" data-a="gengo" data-k="${g.id}"><b>${g.t}</b><span>${g.d}</span><div class="bar"><i style="width:${v}%"></i></div><div class="meta"><span>${it?`${it.c} réussi(s) · ${it.w} raté(s)`:"Pas encore fait"}</span><span>${v} %</span></div></button>`}).join("")}</div></div>`).join("")}`);
+}
+function pickWeighted(list,n){return list.map(q=>({q,s:mIt(q.id)+Math.random()*.6})).sort((a,b)=>a.s-b.s).slice(0,n).map(x=>x.q)}
+
+/* ----- moteur d’exercices ----- */
+let SESSION=null,TIMER=null,LASTF=null;
+function inst(id){
+  if(GENM[id]){const g=GENM[id],o=g.make();return Object.assign({id,ch:g.ch,label:g.t},o,o.choices?{type:"ch"}:{type:"in"})}
+  const q=BANK.find(b=>b.id===id);
+  if(q.t==="vf")return{id,ch:q.ch,type:"ch",q:q.q,choices:["Vrai","Faux"],ans:q.a?"Vrai":"Faux",ansTxt:q.a?"Vrai":"Faux",sol:q.exp,label:"Vrai ou faux"};
+  return{id,ch:q.ch,type:"ch",q:q.q,choices:shuffle(q.c),ans:q.c[0],ansTxt:q.c[0],sol:q.exp,label:"Question de cours"};
+}
+function startQuiz(title,ids,mode="quiz",mins=0){
+  if(!ids.length){show(`<div class="sess"><div class="card empty">Aucun exercice disponible avec ces chapitres.<br><br><a class="btn" href="#entrainement">Retour</a></div></div>`);return}
+  clearInterval(TIMER);
+  SESSION={kind:"quiz",title,mode,items:ids.map(inst),i:0,res:[],locked:false,end:mins?Date.now()+mins*60000:0};
+  if(mins)TIMER=setInterval(tick,1000);
+  renderQ();
+}
+function tick(){const s=SESSION;if(!s||!s.end){clearInterval(TIMER);return}const left=Math.max(0,s.end-Date.now()),el=$("#timer");
+  if(el){el.textContent=`${Math.floor(left/60000)}:${pad(Math.floor(left/1000)%60)}`;el.classList.toggle("low",left<120000)}
+  if(left<=0){clearInterval(TIMER);finishQuiz()}}
+const inp=i=>`<input id="f${i}" autocomplete="off" inputmode="text" aria-label="Réponse ${i+1}">`;
+function fieldsHtml(it){
+  if(it.lay==="vec")return `<div class="ans"><span>${it.lab} (</span>${inp(0)}<span>;</span>${inp(1)}<span>)</span></div>`;
+  if(it.lay==="eq")return `<div class="ans">${inp(0)}<span>x +</span>${inp(1)}<span>y +</span>${inp(2)}<span>= 0</span></div>`;
+  return `<div class="ans"><span>${it.lab} =</span>${inp(0)}</div>`;
+}
+const nF=it=>it.lay==="vec"?2:it.lay==="eq"?3:1;
+function renderQ(){
+  const s=SESSION;if(s.i>=s.items.length)return finishQuiz();
+  const it=s.items[s.i],c=CHM[it.ch];
+  show(`<div class="sess"><div class="sess-top"><span class="t">${esc(s.title)}</span><div class="row">${s.end?`<span class="timer" id="timer">--:--</span>`:""}<span class="cnt">${s.i+1} / ${s.items.length}</span><button class="btn sm" data-a="quit">Quitter</button></div></div>
+  <div class="bar"><i style="width:${100*s.i/s.items.length}%"></i></div>
+  <div class="qcard" data-ch="${it.ch}"><div class="qhead"><span class="chip">${c.short}</span><span class="small muted">${it.label}</span></div><p class="qtext">${it.q}</p>
+   ${it.fig?`<div class="fig"><div class="fig-sc">${it.fig}</div></div>`:""}
+   ${it.type==="ch"?`<div class="choices ${it.choices.length===2?"vf":""}">${it.choices.map((ch,k)=>`<button class="choice" data-a="pick" data-k="${k}"><kbd>${k+1}</kbd><span>${ch}</span></button>`).join("")}</div>`
+   :`${fieldsHtml(it)}<div class="keys" aria-label="Symboles"><button data-a="ins" data-t="−">−</button><button data-a="ins" data-t="√">√</button><button data-a="ins" data-t="/">/</button><button data-a="ins" data-t=",">,</button></div>
+    <p class="hint" id="hint">${it.hint||"Écris un nombre : −3, 2,5 ou 3/2."}</p><div class="row" id="subrow"><button class="btn pri" data-a="submit">${s.mode==="exam"?"Valider":"Vérifier"}</button></div>`}
+   <div id="fb"></div></div></div>`);
+  if(s.end)tick();
+  if(it.type==="in"){const f=$("#f0");f&&f.focus({preventScroll:true})}
+}
+function feedback(it,ok){
+  return `<div class="fb ${ok?"ok":"ko"}"><b>${ok?"Bonne réponse":"Pas tout à fait"}</b>${ok?"":`<span>Réponse attendue : <b>${it.ansTxt}</b></span>`}<div class="sol">${it.sol}</div></div>
+  <div class="foot" style="margin-top:12px"><span class="small muted">Touche Entrée pour continuer</span><button class="btn pri" data-a="next" id="nextb">${SESSION.i+1<SESSION.items.length?"Exercice suivant":"Voir le résultat"}</button></div>`;
+}
+function choose(k){
+  const s=SESSION;if(!s||s.locked)return;const it=s.items[s.i],chosen=it.choices[k],ok=chosen===it.ans;
+  s.res.push({it,given:chosen,ok});record(it.id,ok);
+  if(s.mode==="exam"){s.i++;renderQ();return}
+  s.locked=true;
+  document.querySelectorAll(".choice").forEach((b,j)=>{b.disabled=true;if(it.choices[j]===it.ans)b.classList.add("ok");else if(j===k)b.classList.add("ko")});
+  $("#fb").innerHTML=feedback(it,ok);$("#nextb").focus({preventScroll:true});
+}
+function submit(){
+  const s=SESSION;if(!s||s.locked)return;const it=s.items[s.i],n=nF(it),raw=[],vals=[];
+  for(let i=0;i<n;i++){const v=$("#f"+i).value;raw.push(v);vals.push(parseX(v))}
+  if(vals.some(v=>v===null)&&s.mode!=="exam"){const h=$("#hint");h.textContent="Remplis chaque case avec un nombre : −3, 2,5, 3/2 ou 2√5.";h.style.color="var(--bad)";return}
+  const ok=!vals.some(v=>v===null)&&!!it.check(vals);
+  s.res.push({it,given:raw.map(r=>r.trim()||"…").join(" ; "),ok});record(it.id,ok);
+  if(s.mode==="exam"){s.i++;renderQ();return}
+  s.locked=true;
+  for(let i=0;i<n;i++){const f=$("#f"+i);f.readOnly=true;f.classList.add(ok?"ok":"ko")}
+  $("#subrow").remove();document.querySelector(".keys").remove();$("#hint").remove();
+  $("#fb").innerHTML=feedback(it,ok);$("#nextb").focus({preventScroll:true});
+}
+function finishQuiz(){
+  clearInterval(TIMER);const s=SESSION;if(!s)return;
+  s.items.slice(s.res.length).forEach(it=>{s.res.push({it,given:"(pas de réponse)",ok:false});record(it.id,false)});
+  const n=s.res.filter(r=>r.ok).length,tot=s.res.length,pct=Math.round(100*n/tot);
+  logSession(s.mode,s.title,n,tot,[...new Set(s.res.map(r=>r.it.ch))]);
+  const by={};s.res.forEach(r=>{by[r.it.ch]=by[r.it.ch]||[0,0];by[r.it.ch][1]++;if(r.ok)by[r.it.ch][0]++});
+  const wrong=s.res.filter(r=>!r.ok);SESSION={kind:"result",wrong:wrong.map(r=>r.it.id),mode:s.mode,title:s.title};
+  const msg=pct>=90?"Excellent, c’est maîtrisé.":pct>=70?"Bon travail. Regarde les corrections ci-dessous.":pct>=50?"C’est un début. Relis les sections concernées, puis refais tes erreurs.":"Reprends le cours de ces chapitres avant de recommencer.";
+  const note=(Math.round(n/tot*200)/10).toString().replace(".",",");
+  show(`<div class="sess"><div class="sess-top"><span class="t">${esc(s.title)} · résultat</span></div>
+  <div class="card stack"><div class="res-big"><b>${s.mode==="exam"?note:n}</b><span class="muted">${s.mode==="exam"?"/ 20":"/ "+tot} · ${pct} %</span></div><p>${msg}</p>
+   <div class="brk">${Object.entries(by).map(([ch,v])=>`<div data-ch="${ch}"><span>${CHM[ch].short}</span><div class="bar"><i style="width:${100*v[0]/v[1]}%"></i></div><span>${v[0]}/${v[1]}</span></div>`).join("")}</div>
+   <div class="row">${wrong.length?`<button class="btn pri" data-a="redo">Refaire mes ${wrong.length} erreur(s)</button>`:""}<a class="btn" href="#${s.mode==="exam"?"examen":"entrainement"}">Retour</a><a class="btn" href="#accueil">Voir ma progression</a></div></div>
+  ${wrong.length?`<div class="card stack"><h3>Corrections</h3><p class="small muted">« Refaire mes erreurs » te redonne le même type d’exercice avec de nouveaux nombres.</p><div class="wrong">${wrong.map(r=>`<div><b>${r.it.q}</b>${r.it.fig?r.it.fig.replace('class="gfig"','class="gfig" style="max-width:300px;margin:0"'):""}<span class="small">Ta réponse : ${esc(r.given)} · Attendu : <b>${r.it.ansTxt}</b></span><details><summary>Voir la correction</summary><div class="sol" style="margin-top:6px;background:var(--bg)">${r.it.sol}</div></details></div>`).join("")}</div></div>`:""}</div>`);
+}
+
+/* ----- flashcards ----- */
+function startFlash(list){if(!list.length)return vTrain();SESSION={kind:"flash",items:list.slice(0,15),i:0,flip:false,known:0};renderFlash()}
+function renderFlash(){
+  const s=SESSION;if(s.i>=s.items.length){logSession("flash","Flashcards",s.known,s.items.length,[...new Set(s.items.map(f=>f.ch))]);
+    show(`<div class="sess"><div class="card stack"><div class="res-big"><b>${s.known}</b><span class="muted">/ ${s.items.length} formules sues</span></div><p>Les cartes marquées « À revoir » reviendront en priorité.</p><div class="row"><button class="btn pri" data-a="flash">Nouveau paquet</button><a class="btn" href="#entrainement">Retour</a></div></div></div>`);SESSION=null;return}
+  const f=s.items[s.i];
+  show(`<div class="sess"><div class="sess-top"><span class="t">Flashcards</span><div class="row"><span class="cnt">${s.i+1} / ${s.items.length}</span><button class="btn sm" data-a="quit">Quitter</button></div></div>
+  <div class="bar"><i style="width:${100*s.i/s.items.length}%"></i></div>
+  <div class="qcard flash" data-ch="${f.ch}" data-a="flip" role="button" tabindex="0"><span class="chip">${CHM[f.ch].short}</span><p class="front">${f.front}</p>${s.flip?`<p class="back">${f.back}</p>`:`<p class="hint">Touche la carte (ou Espace) pour voir la réponse</p>`}</div>
+  ${s.flip?`<div class="row" style="justify-content:center"><button class="btn" data-a="fno">À revoir</button><button class="btn pri" data-a="fyes">Je savais</button></div>`:""}</div>`);
+}
+
+/* ================= INTERRO BLANCHE ================= */
+function vExam(){
+  const ex=S.log.filter(l=>l.k==="exam").slice(-5).reverse();
+  show(`<div class="head"><p class="eyebrow">Conditions réelles</p><h1>Interro blanche</h1><p class="lead">20 exercices sur les six chapitres : surtout des calculs, plus quelques questions de cours. Chronomètre de 30 minutes. Pas de correction avant la fin, comme le jour de l’interro.</p></div>
+  <div class="grid g2"><div class="card stack"><h3>Prêt ?</h3><ul class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px"><li>Note sur 20 à la fin, avec le détail par chapitre et toutes les corrections.</li><li>Garde un brouillon à côté de toi pour les calculs.</li><li>Tes erreurs sont ajoutées à la révision intelligente.</li></ul>
+   <div class="row"><button class="btn pri" data-a="exam">Commencer l’interro</button></div></div>
+   <div class="card stack"><h3>Tes dernières interros</h3>${ex.length?`<div class="hist">${ex.map(e=>`<div><span>${new Date(e.t).toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"long"})}</span><span class="muted">${Math.round(100*e.s/e.tot)} %</span><b>${(Math.round(e.s/e.tot*200)/10).toString().replace(".",",")} / 20</b></div>`).join("")}</div>`:`<p class="muted small">Aucune interro pour l’instant.</p>`}</div></div>`);
+}
+function startExam(){let l=[];CH.forEach(c=>{l.push(...shuffle(GEN.filter(g=>g.ch===c.id)).slice(0,c.id==="met"?3:2).map(g=>g.id));l.push(pick(BANK.filter(q=>q.ch===c.id)).id)});
+  l.push(pick(GEN.filter(g=>g.ch!=="met")).id);startQuiz("Interro blanche",shuffle(l).slice(0,20),"exam",30)}
+
+/* ================= PROGRÈS ================= */
+let confirmReset=false;
+function vProg(){
+  const h=S.log.slice(-12).reverse(),kind={quiz:"Série",exam:"Interro blanche",flash:"Flashcards"};
+  show(`<div class="head"><p class="eyebrow">Suivi</p><h1>Ma progression</h1><p class="lead">Ta maîtrise par chapitre, les compétences à cocher avant l’interro et l’historique de tes séries.</p></div>
+  <div class="card" style="margin-bottom:16px"><div class="tbl-wrap"><table><tr><th>Chapitre</th><th>Cours lu</th><th>Exercices</th><th>Erreurs à revoir</th><th>Total</th></tr>
+  ${CH.map(c=>`<tr data-ch="${c.id}"><td><a href="#cours-${c.id}"><b>${c.short}</b></a></td><td>${chRead(c.id)}/${SECS[c.id].length}</td><td style="min-width:120px"><div class="bar"><i style="width:${Math.round(100*chMastery(c.id))}%"></i></div></td><td>${PRACT.filter(q=>q.ch===c.id&&isErr(q.id)).length}</td><td><b>${chScore(c.id)} %</b></td></tr>`).join("")}</table></div></div>
+  <div class="grid g2">
+   <div class="card stack"><div class="sec-title"><h3>Compétences à maîtriser</h3><span class="small muted">${SKILLS.filter(s=>S.skills[s.id]).length}/${SKILLS.length}</span></div>
+   <p class="small muted">Coche une compétence quand tu sais la faire sans regarder la fiche.</p>
+   <div class="skills">${SKILLS.map(s=>`<button class="skill ${S.skills[s.id]?"on":""}" data-a="skill" data-k="${s.id}" data-ch="${s.ch}"><span class="box"></span><span>${s.t} <span class="chip" style="font-size:10px;padding:1px 6px">${CHM[s.ch].short}</span></span></button>`).join("")}</div></div>
+   <div class="stack">
+    <div class="card chart"><h3 style="margin-bottom:10px">Scores des dernières séries</h3>${chart()}</div>
+    <div class="card"><h3 style="margin-bottom:6px">Historique</h3>${h.length?`<div class="hist">${h.map(e=>`<div><span>${kind[e.k]||e.k}${e.n&&e.n!==kind[e.k]?` · <span class="muted">${esc(e.n)}</span>`:""}</span><span class="muted">${new Date(e.t).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}</span><b>${e.s}/${e.tot}</b></div>`).join("")}</div>`:`<p class="small muted">Aucune série pour l’instant.</p>`}</div>
+    <div class="card stack"><h3>Recommencer à zéro</h3>${confirmReset?`<div class="confirm"><span class="small">Toute ta progression sera effacée. Continuer ?</span><button class="btn sm danger" data-a="resetyes">Oui, tout effacer</button><button class="btn sm" data-a="resetno">Annuler</button></div>`:`<p class="small muted">Efface les réponses, sections lues et compétences cochées.</p><div><button class="btn sm danger" data-a="reset">Effacer ma progression</button></div>`}</div>
+   </div></div>`);
+}
+
+/* ================= ROUTEUR ================= */
+function route(){
+  clearInterval(TIMER);SESSION=null;
+  const h=(location.hash||"#accueil").slice(1)||"accueil";CUR=h;renderSide();
+  if(h.startsWith("cours-"))return vChapter(h.slice(6));
+  ({accueil:vAccueil,cours:vCoursList,entrainement:vTrain,examen:vExam,progres:vProg}[h]||vAccueil)();
+}
+window.addEventListener("hashchange",route);
+
+/* ================= ACTIONS ================= */
+const genIds=chs=>GEN.filter(g=>chs.has(g.ch));
+const ACT={
+ read(b){const ch=b.closest("[data-ch]").dataset.ch,k=ch+"/"+b.dataset.s;if(S.read[k])delete S.read[k];else S.read[k]=1;save();b.classList.toggle("on",!!S.read[k]);b.textContent=S.read[k]?"✓ Section lue":"Marquer comme lue";
+   const t=document.querySelector(`.toc a[data-s="${b.dataset.s}"]`);t&&t.classList.toggle("read",!!S.read[k])},
+ jump(b,e){e.preventDefault();const el=document.getElementById("s-"+b.dataset.s);el&&el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})},
+ fil(b){const c=b.dataset.ch2;if(FIL.has(c)&&FIL.size>1)FIL.delete(c);else FIL.add(c);vTrain()},
+ quiz(){startQuiz("Questions de cours",pickWeighted(BANK.filter(q=>FIL.has(q.ch)),10).map(q=>q.id))},
+ quizch(b){startQuiz("Cours · "+CHM[b.dataset.ch2].short,pickWeighted(BANK.filter(q=>q.ch===b.dataset.ch2),8).map(q=>q.id))},
+ genmix(){const g=genIds(FIL);const l=[];for(let i=0;i<10;i++)l.push(pickWeighted(g,Math.min(4,g.length))[Math.floor(Math.random()*Math.min(4,g.length))].id);startQuiz("Série de calculs",l)},
+ genchx(b){const g=GEN.filter(x=>x.ch===b.dataset.ch2);const l=shuffle([...g,...g]).slice(0,8).map(x=>x.id);startQuiz("Exercices · "+CHM[b.dataset.ch2].short,l)},
+ gengo(b){const g=GENM[b.dataset.k];startQuiz(g.t,Array(5).fill(g.id))},
+ smart(){const pool=PRACT.filter(q=>FIL.has(q.ch));const e=shuffle(pool.filter(q=>isErr(q.id))),d=shuffle(pool.filter(q=>isDue(q.id))),u=shuffle(pool.filter(q=>!S.items[q.id])),r=pickWeighted(pool.filter(q=>S.items[q.id]&&!isErr(q.id)&&!isDue(q.id)),12);
+   startQuiz("Révision intelligente",shuffle([...new Set([...e,...d,...u,...r].map(q=>q.id))].slice(0,12)))},
+ flash(){startFlash(FLASH.filter(f=>FIL.has(f.ch)).map(f=>({f,s:mIt(f.id)+Math.random()*.7})).sort((a,b)=>a.s-b.s).map(x=>x.f))},
+ flashch(b){startFlash(shuffle(FLASH.filter(f=>f.ch===b.dataset.ch2)))},
+ flip(){if(SESSION&&SESSION.kind==="flash"&&!SESSION.flip){SESSION.flip=true;renderFlash()}},
+ fyes(){const s=SESSION;record(s.items[s.i].id,true);s.known++;s.i++;s.flip=false;renderFlash()},
+ fno(){const s=SESSION;record(s.items[s.i].id,false);s.i++;s.flip=false;renderFlash()},
+ pick(b){choose(+b.dataset.k)},
+ submit(){submit()},
+ ins(b){const f=(LASTF&&document.body.contains(LASTF)&&!LASTF.readOnly)?LASTF:$("#f0");if(!f)return;const t=b.dataset.t,p=f.selectionStart??f.value.length;f.value=f.value.slice(0,p)+t+f.value.slice(f.selectionEnd??p);f.focus();f.setSelectionRange(p+1,p+1)},
+ next(){if(SESSION&&SESSION.kind==="quiz"){SESSION.i++;SESSION.locked=false;renderQ()}},
+ quit(){const back=SESSION&&SESSION.mode==="exam"?"examen":"entrainement";if(location.hash==="#"+back)route();else location.hash=back},
+ redo(){startQuiz("Mes erreurs",shuffle(SESSION.wrong))},
+ exam(){startExam()},
+ skill(b){const k=b.dataset.k;if(S.skills[k])delete S.skills[k];else S.skills[k]=1;save();b.classList.toggle("on",!!S.skills[k]);b.closest(".card").querySelector(".sec-title .muted").textContent=`${SKILLS.filter(s=>S.skills[s.id]).length}/${SKILLS.length}`},
+ reset(){confirmReset=true;vProg()},
+ resetno(){confirmReset=false;vProg()},
+ resetyes(){confirmReset=false;S=blank();save();vProg()}
+};
+document.addEventListener("pointerdown",e=>{if(e.target.closest(".keys"))e.preventDefault()});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||!ACT[b.dataset.a])return;ACT[b.dataset.a](b,e)});
+document.addEventListener("focusin",e=>{if(/^f\d$/.test(e.target.id))LASTF=e.target});
+document.addEventListener("input",e=>{if(e.target.dataset.live)runLive(e.target.dataset.live)});
+document.addEventListener("keydown",e=>{
+  const s=SESSION;if(!s||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  if(s.kind==="quiz"){
+    const it=s.items[s.i];
+    if(e.key==="Enter"){e.preventDefault();if(s.locked)ACT.next();else if(it&&it.type==="in"){const n=nF(it),i=/^f\d$/.test(e.target.id)?+e.target.id.slice(1):-1;if(i>=0&&i<n-1&&!e.target.value.trim()){$("#f"+(i+1)).focus()}else submit()}return}
+    if(e.target.tagName==="INPUT")return;
+    if(!s.locked&&it&&it.type==="ch"&&/^[1-4]$/.test(e.key)){const k=+e.key-1;if(k<it.choices.length){e.preventDefault();choose(k)}}
+  }
+  if(s.kind==="flash"){if(!s.flip&&(e.key===" "||e.key==="Enter")){e.preventDefault();ACT.flip()}else if(s.flip&&e.key==="ArrowRight")ACT.fyes();else if(s.flip&&e.key==="ArrowLeft")ACT.fno()}
+});
+
+route();
+initCloud();
+</script>
+</body>
+</html>
